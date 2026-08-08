@@ -9,7 +9,7 @@ export default function CandidateSignUpPage() {
         path="/auth/candidate/sign-up"
         routing="path"
         signInUrl="/auth/candidate/sign-in"
-        fallbackRedirectUrl="/protected/student/dashboard"
+        fallbackRedirectUrl="/protected"
       />
     </div>
   )

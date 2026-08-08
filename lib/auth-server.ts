@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server"
 import type { UserRole } from "@/types/platform"
 import { prisma } from "@/lib/prisma"
+import { syncClerkRole } from "@/lib/clerk-provision"
 
 export class UnauthorizedError extends Error {
   constructor() {
@@ -25,15 +26,18 @@ async function provisionUser(clerkId: string) {
 
   const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || email
 
-  const role: UserRole = email.toLowerCase() === (process.env.SEED_ADMIN_EMAIL || "").toLowerCase() && email
-    ? "ADMIN"
-    : "STUDENT"
+  const metadataRole = clerkUser.publicMetadata?.role as UserRole | undefined
+  const role: UserRole = metadataRole
+    ?? (email.toLowerCase() === (process.env.SEED_ADMIN_EMAIL || "").toLowerCase() && email ? "ADMIN" : "STUDENT")
 
-  return prisma.user.upsert({
+  const user = await prisma.user.upsert({
     where: { email },
     update: { clerkId },
     create: { clerkId, email, name, role, status: "ACTIVE" },
   })
+
+  await syncClerkRole(clerkId, user.role)
+  return user
 }
 
 export async function requireUser() {
