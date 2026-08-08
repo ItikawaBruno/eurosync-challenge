@@ -8,7 +8,6 @@ export default function CandidateSignInPage() {
       <SignIn
         path="/auth/candidate/sign-in"
         routing="path"
-        signUpUrl="/auth/candidate/sign-up"
         fallbackRedirectUrl="/protected"
       />
     </div>
