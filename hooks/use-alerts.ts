@@ -1,26 +1,34 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { apiFetch } from "@/lib/fetcher"
+
+type AlertRecord = {
+  id: string
+  status: string
+  severity: string
+  type: string
+  message: string
+  student: { name: string } | null
+  class: { name: string } | null
+}
+
 export function useAlerts() {
-  return {
-    data: [
-      {
-        id: "1",
-        status: "OPEN",
-        severity: "HIGH",
-        type: "LOW_ATTENDANCE",
-        message: "Frequência abaixo do esperado nesta semana.",
-        student: { name: "Ana Pereira" },
-        class: { name: "Turma 8A" },
-      },
-    ],
-    isPending: false,
-    isError: false,
-  }
+  const query = useQuery({
+    queryKey: ["alerts"],
+    queryFn: () => apiFetch<AlertRecord[]>("/api/alerts"),
+  })
+  return { data: query.data, isPending: query.isPending, isError: query.isError }
 }
 
 export function useUpdateAlert() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: (payload: { id: string; status: string }) =>
+      apiFetch<AlertRecord>(`/api/alerts/${payload.id}`, { method: "PATCH", body: JSON.stringify(payload) }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["alerts"] }),
+  })
   return {
-    mutate: (_payload: any, options?: { onSuccess?: () => void }) => {
-      options?.onSuccess?.()
-    },
-    isPending: false,
+    mutate: (payload: { id: string; status: string }, options?: { onSuccess?: () => void }) =>
+      mutation.mutate(payload, options),
+    isPending: mutation.isPending,
   }
 }

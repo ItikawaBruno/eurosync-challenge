@@ -44,7 +44,7 @@ export function UsersTable() {
   const handleCreate = () => {
     if (!createName.trim() || !createEmail.trim()) return
     createUser.mutate(
-      { id: `user_${Date.now()}`, name: createName, email: createEmail, role: createRole },
+      { name: createName, email: createEmail, role: createRole },
       { onSuccess: () => { setCreateName(""); setCreateEmail(""); setCreateRole("STUDENT"); createModalState.close() } },
     )
   }

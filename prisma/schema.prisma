@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  PROFESSOR
+  STUDENT
+  PARENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ClassStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum LessonStatus {
+  OPEN
+  CLOSED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  JUSTIFIED
+}
+
+enum CheckInMethod {
+  LOCATION
+  QR_CODE
+}
+
+enum AlertStatus {
+  OPEN
+  RESOLVED
+  IGNORED
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AlertType {
+  LOW_ATTENDANCE
+  LOW_ENGAGEMENT
+  DROPPING_PROGRESS
+  ABSENCE_SEQUENCE
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum SyncStatus {
+  SUCCESS
+  SYNCING
+  ERROR
+  PENDING
+  WARNING
+}
+
+enum LmsEntity {
+  COURSES
+  CLASSES
+  STUDENTS
+  PROFESSORS
+  ENROLLMENTS
+  PROGRESS
+  ATTENDANCE
+  ACTIVITIES
+  GRADES
+  COMPLETIONS
+}
+
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String?    @unique
+  name      String
+  email     String     @unique
+  role      UserRole
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  taughtClasses Class[]        @relation("ClassTeacher")
+  enrollments   ClassStudent[]
+  attendances   Attendance[]
+  alerts        Alert[]        @relation("AlertStudent")
+
+  @@index([role])
+}
+
+model Class {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  status      ClassStatus @default(ACTIVE)
+  teacherId   String
+  teacher     User        @relation("ClassTeacher", fields: [teacherId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  students ClassStudent[]
+  lessons  Lesson[]
+  alerts   Alert[]        @relation("AlertClass")
+
+  @@index([teacherId])
+}
+
+model ClassStudent {
+  id         String   @id @default(cuid())
+  classId    String
+  class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  enrolledAt DateTime @default(now())
+
+  @@unique([classId, studentId])
+}
+
+model Lesson {
+  id            String       @id @default(cuid())
+  classId       String
+  class         Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title         String
+  startsAt      DateTime
+  endsAt        DateTime
+  status        LessonStatus @default(OPEN)
+  locationName  String?
+  locationLat   Float?
+  locationLng   Float?
+  qrCodeToken   String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  attendances Attendance[]
+
+  @@index([classId])
+}
+
+model Attendance {
+  id            String            @id @default(cuid())
+  lessonId      String
+  lesson        Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       User              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status        AttendanceStatus
+  checkinMethod CheckInMethod?
+  latitude      Float?
+  longitude     Float?
+  checkedInAt   DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([lessonId, studentId])
+  @@index([studentId])
+}
+
+model Alert {
+  id         String        @id @default(cuid())
+  status     AlertStatus   @default(OPEN)
+  severity   AlertSeverity
+  type       AlertType
+  message    String
+  studentId  String?
+  student    User?         @relation("AlertStudent", fields: [studentId], references: [id], onDelete: SetNull)
+  classId    String?
+  class      Class?        @relation("AlertClass", fields: [classId], references: [id], onDelete: SetNull)
+  createdAt  DateTime      @default(now())
+  resolvedAt DateTime?
+
+  @@index([studentId])
+  @@index([status])
+}
+
+model Integration {
+  id        String            @id @default(cuid())
+  name      String
+  provider  String
+  baseUrl   String?
+  status    IntegrationStatus @default(ACTIVE)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model LmsSyncState {
+  id         String     @id @default(cuid())
+  entity     LmsEntity  @unique
+  count      Int        @default(0)
+  lastSyncAt DateTime?
+  status     SyncStatus @default(PENDING)
+}
+
+model LmsSyncLog {
+  id               String     @id @default(cuid())
+  timestamp        DateTime   @default(now())
+  action            String
+  entity           LmsEntity
+  recordsProcessed Int
+  status           SyncStatus
+  message          String
+}
+
+model LmsCourseRecord {
+  id       String @id @default(cuid())
+  name     String
+  category String
+  workload Int
+  status   String
+}
+
+model LmsClassRecord {
+  id             String @id @default(cuid())
+  courseName     String
+  professorName  String
+  period         String
+  enrolledCount  Int
+  status         String
+}
+
+model LmsStudentRecord {
+  id              String @id @default(cuid())
+  name            String
+  email           String
+  enrollment      String
+  progress        Int
+  digitalPresence Int
+  status          String
+}
+
+model LmsProfessorRecord {
+  id            String @id @default(cuid())
+  name          String
+  email         String
+  department    String
+  coursesCount  Int
+}
+
+model LmsEnrollmentRecord {
+  id          String   @id @default(cuid())
+  studentName String
+  className   String
+  status      String
+  enrolledAt  DateTime
+}
+
+model LmsProgressRecord {
+  id              String @id @default(cuid())
+  studentName     String
+  courseName      String
+  progressPercent Int
+  status          String
+}
+
+model LmsAttendanceRecord {
+  id          String   @id @default(cuid())
+  studentName String
+  className   String
+  date        DateTime
+  status      String
+  duration    Int
+}
+
+model LmsActivityRecord {
+  id         String   @id @default(cuid())
+  title      String
+  courseName String
+  type       String
+  dueDate    DateTime
+  status     String
+}
+
+model LmsGradeRecord {
+  id            String @id @default(cuid())
+  studentName   String
+  activityTitle String
+  grade         Float
+  maxGrade      Float
+  percentage    Int
+}
+
+model LmsCompletionRecord {
+  id                 String  @id @default(cuid())
+  studentName        String
+  courseName         String
+  completionPercent  Int
+  certificateIssued  Boolean @default(false)
+  status             String
+}
