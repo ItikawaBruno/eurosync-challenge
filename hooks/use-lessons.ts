@@ -1,5 +1,5 @@
 export function useLessons() {
-  return { data: [{ id: "1", title: "Aula 1", startsAt: "08:00", endsAt: "09:00" }], isPending: false }
+  return { data: [{ id: "1", title: "Aula 1", startsAt: "08:00", endsAt: "09:00", status: "OPEN" }], isPending: false }
 }
 
 export function useLesson(id: string) {

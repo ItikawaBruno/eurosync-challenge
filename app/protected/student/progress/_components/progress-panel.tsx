@@ -1,3 +1,5 @@
+"use client"
+
 import { BookOpen, CheckCircle2, TrendingUp } from "lucide-react"
 import { MetricCard } from "@/components/platform/ui/metric-card"
 import { SectionCard } from "@/components/platform/ui/card"
@@ -34,4 +36,5 @@ export function ProgressPanel() {
 function Score({ label, value }: { label: string; value: string }) {
   return <div className="rounded-xl border bg-slate-50 p-4"><p className="text-sm text-muted-foreground">{label}</p><p className="mt-2 text-2xl font-semibold">{value}</p></div>
 }
+
 

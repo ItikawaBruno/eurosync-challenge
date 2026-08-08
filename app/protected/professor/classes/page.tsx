@@ -1,3 +1,5 @@
+"use client"
+
 import { PageHeader } from "@/components/platform/layout/page-header"
 import { useClasses } from "@/hooks/use-classes"
 import { ProfessorClassCard } from "./_components/professor-class-card"

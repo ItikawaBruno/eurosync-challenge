@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Bell, CalendarDays, CheckCircle2, TrendingUp } from "lucide-react"
 import { MetricCard } from "@/components/platform/ui/metric-card"
@@ -48,4 +50,5 @@ export function StudentDashboardContent() {
     </div>
   )
 }
+
 

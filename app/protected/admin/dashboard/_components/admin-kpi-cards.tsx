@@ -1,3 +1,5 @@
+"use client"
+
 import { AlertTriangle, School, TrendingUp, Users } from "lucide-react"
 import { MetricCard } from "@/components/platform/ui/metric-card"
 import { MetricsSkeleton } from "@/components/platform/ui/loading"
@@ -17,4 +19,5 @@ export function AdminKpiCards() {
     </div>
   )
 }
+
 

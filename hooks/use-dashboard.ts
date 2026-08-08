@@ -21,9 +21,29 @@ export function useAdminDashboard() {
 }
 
 export function useProfessorDashboard() {
-  return { data: { summary: { lessons: 6, students: 32, alerts: 2 } }, isPending: false }
+  return {
+    data: {
+      summary: { lessons: 6, students: 32, alerts: 2 },
+      attendanceAverage: 92,
+      myClasses: [{ id: "1", name: "SP-01" }, { id: "2", name: "CN-03" }],
+      studentsAtRisk: [{ id: "s1" }, { id: "s2" }],
+      monthlyAttendance: [
+        { label: "Jan", value: 88 },
+        { label: "Fev", value: 90 },
+        { label: "Mar", value: 91 },
+      ]
+    },
+    isPending: false
+  }
 }
 
 export function useStudentDashboard() {
-  return { data: { summary: { attendance: 95, lessons: 4, nextLesson: "Matemática" } }, isPending: false }
+  return {
+    data: {
+      summary: { attendance: 95, lessons: 4, nextLesson: "Matemática" },
+      attendance: { rate: 95, present: 19, total: 20 },
+      nextLesson: { title: "Matemática", startsAt: "2026-08-01T14:00:00Z" }
+    },
+    isPending: false
+  }
 }

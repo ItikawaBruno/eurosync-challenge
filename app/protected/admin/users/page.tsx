@@ -5,7 +5,7 @@ export default function AdminUsersPage() {
   return (
     <>
       <PageHeader title="Usuarios" description="Gerencie contas, permissões e roles de acesso." />
-      <UsersTable createModalState={{ isOpen: false, open: () => {}, close: () => {} } as any} />
+      <UsersTable />
     </>
   )
 }

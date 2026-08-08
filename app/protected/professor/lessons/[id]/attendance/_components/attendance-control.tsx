@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/platform/ui/button"
 import { SectionCard } from "@/components/platform/ui/card"
 import { PageSpinner } from "@/components/platform/ui/loading"

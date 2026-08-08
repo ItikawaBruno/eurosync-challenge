@@ -11,5 +11,5 @@ export function useUpdateAttendance() {
 }
 
 export function useCheckIn() {
-  return { mutate: (_payload: any, options?: { onSuccess?: () => void }) => options?.onSuccess?.() }
+  return { mutate: (_payload: any, options?: { onSuccess?: () => void }) => options?.onSuccess?.(), isPending: false }
 }

@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/platform/layout/page-header"
-import { StudentDashboardContent } from "./-components/student-dashboard-content"
+import { StudentDashboardContent } from "./_components/student-dashboard-content"
 
 export default function StudentDashboardPage() {
   return (
