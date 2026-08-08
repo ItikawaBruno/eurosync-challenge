@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/fetcher"
 
-type AttendanceByLesson = { id: string; student: { name: string }; status: string }
+type AttendanceByLesson = { id: string; student: { id: string; name: string }; status: string }
 type AttendanceByStudent = { id: string; status: string; date: string }
 
 export function useAttendanceByLesson(lessonId: string) {
