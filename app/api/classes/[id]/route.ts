@@ -10,7 +10,7 @@ export async function GET(_request: NextRequest, ctx: RouteContext<"/api/classes
 
     const cls = await prisma.class.findUniqueOrThrow({
       where: { id },
-      include: { _count: { select: { students: true, lessons: true } } },
+      include: { _count: { select: { students: true, lessons: true } }, teacher: { select: { id: true, name: true } } },
     })
 
     return NextResponse.json(cls)
@@ -25,8 +25,8 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/classe
 
     const cls = await prisma.class.update({
       where: { id },
-      data: { name: body.name, description: body.description ?? null },
-      include: { _count: { select: { students: true, lessons: true } } },
+      data: { name: body.name, description: body.description ?? null, teacherId: body.teacherId ?? undefined },
+      include: { _count: { select: { students: true, lessons: true } }, teacher: { select: { id: true, name: true } } },
     })
 
     return NextResponse.json(cls)

@@ -19,6 +19,26 @@ export function AttendanceLineChart({ data }: { data: Array<{ label: string; val
   )
 }
 
+export function CountBarChart({ data, title = "Evolucao" }: { data: Array<{ label: string; value: number }>; title?: string }) {
+  const max = Math.max(1, ...data.map((d) => d.value))
+  return (
+    <div className="h-full rounded-3xl border border-slate-200 bg-white p-6">
+      <div className="text-sm text-muted-foreground">{title}</div>
+      <div className="mt-6 grid gap-3">
+        {data.map((item) => (
+          <div key={item.label} className="flex items-center gap-3">
+            <span className="w-24 text-sm text-muted-foreground">{item.label}</span>
+            <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-sky-600" style={{ width: `${(item.value / max) * 100}%` }} />
+            </div>
+            <span className="w-10 text-right font-semibold">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function EngagementBarChart({ data }: { data: Array<{ label: string; value: number }> }) {
   return (
     <div className="h-full rounded-3xl border border-slate-200 bg-white p-6">

@@ -51,3 +51,37 @@ export async function requireRole(...roles: UserRole[]) {
   if (!roles.includes(user.role)) throw new ForbiddenError()
   return user
 }
+
+export async function requireClassAccess(classId: string) {
+  const user = await requireUser()
+  if (user.role === "ADMIN") return user
+
+  if (user.role === "PROFESSOR") {
+    const owns = await prisma.class.findFirst({ where: { id: classId, teacherId: user.id } })
+    if (!owns) throw new ForbiddenError()
+    return user
+  }
+
+  if (user.role === "STUDENT") {
+    const enrolled = await prisma.classStudent.findUnique({
+      where: { classId_studentId: { classId, studentId: user.id } },
+    })
+    if (!enrolled) throw new ForbiddenError()
+    return user
+  }
+
+  throw new ForbiddenError()
+}
+
+export async function requireClassManage(classId: string) {
+  const user = await requireUser()
+  if (user.role === "ADMIN") return user
+
+  if (user.role === "PROFESSOR") {
+    const owns = await prisma.class.findFirst({ where: { id: classId, teacherId: user.id } })
+    if (!owns) throw new ForbiddenError()
+    return user
+  }
+
+  throw new ForbiddenError()
+}

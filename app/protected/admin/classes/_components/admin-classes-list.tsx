@@ -10,11 +10,11 @@ import { StatusBadge } from "@/components/platform/ui/status-badge"
 import { CardSkeleton } from "@/components/platform/ui/loading"
 import { AppModal, useOverlayState } from "@/components/platform/ui/app-modal"
 import { useClasses, useCreateClass, useUpdateClass, useDeleteClass } from "@/hooks/use-classes"
-import { useMe } from "@/hooks/use-user"
+import { useUsers } from "@/hooks/use-user"
 
 export function AdminClassesList() {
   const { data: classes, isPending } = useClasses()
-  const { data: me } = useMe()
+  const { data: professors } = useUsers("PROFESSOR")
   const createClass = useCreateClass()
   const updateClass = useUpdateClass()
   const deleteClass = useDeleteClass()
@@ -24,22 +24,23 @@ export function AdminClassesList() {
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [teacherId, setTeacherId] = useState("")
   const [editingClass, setEditingClass] = useState<any>(null)
   const [deletingClass, setDeletingClass] = useState<any>(null)
 
   const handleCreate = () => {
-    if (!name.trim() || !me?.id) return
+    if (!name.trim() || !teacherId) return
     createClass.mutate(
-      { name, description: description || undefined, teacherId: me.id },
-      { onSuccess: () => { setName(""); setDescription(""); modal.close() } },
+      { name, description: description || undefined, teacherId },
+      { onSuccess: () => { setName(""); setDescription(""); setTeacherId(""); modal.close() } },
     )
   }
 
   const handleEdit = () => {
     if (!editingClass || !name.trim()) return
     updateClass.mutate(
-      { id: editingClass.id, name, description: description || undefined },
-      { onSuccess: () => { setEditingClass(null); setName(""); setDescription(""); editModal.close() } },
+      { id: editingClass.id, name, description: description || undefined, teacherId: teacherId || undefined },
+      { onSuccess: () => { setEditingClass(null); setName(""); setDescription(""); setTeacherId(""); editModal.close() } },
     )
   }
 
@@ -55,6 +56,7 @@ export function AdminClassesList() {
     setEditingClass(cls)
     setName(cls.name)
     setDescription((cls as any).description || "")
+    setTeacherId(cls.teacher?.id ?? "")
     editModal.open()
   }
 
@@ -82,6 +84,7 @@ export function AdminClassesList() {
               <StatusBadge label={cls.status} />
             </div>
             <dl className="mt-5 grid gap-3 text-sm">
+              <div className="flex justify-between"><dt className="text-muted-foreground">Professor</dt><dd className="font-medium">{cls.teacher?.name ?? "-"}</dd></div>
               <div className="flex justify-between"><dt className="text-muted-foreground">Alunos</dt><dd className="font-medium">{(cls as any)._count?.students ?? 0}</dd></div>
               <div className="flex justify-between"><dt className="text-muted-foreground">Aulas</dt><dd className="font-medium">{(cls as any)._count?.lessons ?? 0}</dd></div>
             </dl>
@@ -89,7 +92,7 @@ export function AdminClassesList() {
               <Button className="flex-1" variant="outline" size="sm" onClick={() => openEditModal(cls)}>Editar</Button>
               <Button className="flex-1 text-red-600" variant="outline" size="sm" onClick={() => openDeleteModal(cls)}>Deletar</Button>
             </div>
-            <Link href={`/professor/classes/${cls.id}`} className="mt-3 flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50" >Abrir detalhes<ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link href={`/protected/admin/classes/${cls.id}`} className="mt-3 flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50" >Abrir detalhes<ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Card>
         ))}
         <Card className="flex min-h-72 flex-col items-center justify-center border-dashed p-6 text-center">
@@ -119,6 +122,18 @@ export function AdminClassesList() {
             <span className="font-medium">Descricao</span>
             <Input value={description} onChange={(e) => setDescription(e.target.value)} />
           </label>
+          <label className="grid gap-2 text-sm">
+            <span className="font-medium">Professor responsavel</span>
+            <select
+              required
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800"
+              value={teacherId}
+              onChange={(e) => setTeacherId(e.target.value)}
+            >
+              <option value="">Selecione um professor</option>
+              {(professors ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </label>
         </div>
       </AppModal>
 
@@ -140,6 +155,17 @@ export function AdminClassesList() {
           <label className="grid gap-2 text-sm">
             <span className="font-medium">Descricao</span>
             <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+          </label>
+          <label className="grid gap-2 text-sm">
+            <span className="font-medium">Professor responsavel</span>
+            <select
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800"
+              value={teacherId}
+              onChange={(e) => setTeacherId(e.target.value)}
+            >
+              <option value="">Selecione um professor</option>
+              {(professors ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
           </label>
         </div>
       </AppModal>

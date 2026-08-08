@@ -17,7 +17,7 @@ export async function GET() {
     const classes = await prisma.class.findMany({
       where,
       orderBy: { name: "asc" },
-      include: { _count: { select: { students: true, lessons: true } } },
+      include: { _count: { select: { students: true, lessons: true } }, teacher: { select: { id: true, name: true } } },
     })
 
     return NextResponse.json(classes)
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         description: body.description ?? null,
         teacherId: body.teacherId,
       },
-      include: { _count: { select: { students: true, lessons: true } } },
+      include: { _count: { select: { students: true, lessons: true } }, teacher: { select: { id: true, name: true } } },
     })
 
     return NextResponse.json(cls, { status: 201 })

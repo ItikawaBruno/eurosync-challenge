@@ -6,6 +6,7 @@ type ClassRecord = {
   name: string
   description: string | null
   status: string
+  teacher?: { id: string; name: string } | null
   _count: { students: number; lessons: number }
 }
 
@@ -43,12 +44,12 @@ export function useCreateClass() {
 export function useUpdateClass() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (payload: { id: string; name: string; description?: string }) =>
+    mutationFn: (payload: { id: string; name: string; description?: string; teacherId?: string }) =>
       apiFetch<ClassRecord>(`/api/classes/${payload.id}`, { method: "PATCH", body: JSON.stringify(payload) }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["classes"] }),
   })
   return {
-    mutate: (payload: { id: string; name: string; description?: string }, options?: { onSuccess?: () => void }) =>
+    mutate: (payload: { id: string; name: string; description?: string; teacherId?: string }, options?: { onSuccess?: () => void }) =>
       mutation.mutate(payload, options),
     isPending: mutation.isPending,
   }
@@ -66,6 +67,15 @@ export function useDeleteClass() {
   }
 }
 
+export function useClassStudents(classId: string) {
+  const query = useQuery({
+    queryKey: ["classes", classId, "students"],
+    queryFn: () => apiFetch<{ id: string; name: string; email: string; enrolledAt: string }[]>(`/api/classes/${classId}/students`),
+    enabled: Boolean(classId),
+  })
+  return { data: query.data, isPending: query.isPending }
+}
+
 export function useAddClassStudents() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
@@ -74,7 +84,10 @@ export function useAddClassStudents() {
         method: "POST",
         body: JSON.stringify({ studentIds: payload.studentIds }),
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["classes"] }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["classes"] })
+      queryClient.invalidateQueries({ queryKey: ["classes", variables.classId, "students"] })
+    },
   })
   return {
     mutate: (payload: { classId: string; studentIds: string[] }, options?: { onSuccess?: () => void }) =>

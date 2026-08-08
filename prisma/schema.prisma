@@ -97,10 +97,11 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  taughtClasses Class[]        @relation("ClassTeacher")
-  enrollments   ClassStudent[]
-  attendances   Attendance[]
-  alerts        Alert[]        @relation("AlertStudent")
+  taughtClasses   Class[]          @relation("ClassTeacher")
+  enrollments     ClassStudent[]
+  attendances     Attendance[]
+  alerts          Alert[]          @relation("AlertStudent")
+  taskSubmissions TaskSubmission[]
 
   @@index([role])
 }
@@ -118,8 +119,36 @@ model Class {
   students ClassStudent[]
   lessons  Lesson[]
   alerts   Alert[]        @relation("AlertClass")
+  tasks    Task[]
 
   @@index([teacherId])
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  classId     String
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  submissions TaskSubmission[]
+
+  @@index([classId])
+}
+
+model TaskSubmission {
+  id          String   @id @default(cuid())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  submittedAt DateTime @default(now())
+
+  @@unique([taskId, studentId])
+  @@index([studentId])
 }
 
 model ClassStudent {

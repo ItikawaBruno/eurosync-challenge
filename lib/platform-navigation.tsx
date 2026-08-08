@@ -35,6 +35,7 @@ export const navItems: NavItem[] = [
   { title: "Alertas", href: "/protected/professor/alerts", icon: AlertTriangle, roles: ["PROFESSOR"] },
 
   { title: "Minha jornada", href: "/protected/student/dashboard", icon: LayoutDashboard, roles: ["STUDENT"] },
+  { title: "Minhas turmas", href: "/protected/student/classes", icon: School, roles: ["STUDENT"] },
   { title: "Confirmar presenca", href: "/protected/student/check-in", icon: CalendarDays, roles: ["STUDENT"] },
   { title: "Agenda", href: "/protected/student/schedule", icon: CalendarDays, roles: ["STUDENT"] },
   { title: "Progresso", href: "/protected/student/progress", icon: BarChart3, roles: ["STUDENT"] },
