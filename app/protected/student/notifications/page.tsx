@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/platform/layout/page-header"
-import { NotificationsList } from "./-components/notifications-list"
+import { NotificationsList } from "./_components/notifications-list"
 
 export default function StudentNotificationsPage() {
   return (

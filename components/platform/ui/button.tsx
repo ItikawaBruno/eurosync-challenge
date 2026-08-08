@@ -19,12 +19,12 @@ const baseClass = "inline-flex items-center justify-center rounded-full text-sm 
 const variantClass: Record<ButtonVariant, string> = {
   default: "bg-slate-900 text-white hover:bg-slate-800",
   outline: "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
-  accent: "bg-violet-600 text-white hover:bg-violet-700",
+  accent: "bg-[#0057B8] text-white hover:bg-[#004a9e]",
   ghost: "bg-transparent text-slate-700 hover:bg-slate-100",
   secondary: "bg-slate-100 text-slate-700 hover:bg-slate-200",
   danger: "bg-red-600 text-white hover:bg-red-700",
   destructive: "bg-red-600 text-white hover:bg-red-700",
-  primary: "bg-slate-900 text-white hover:bg-slate-800",
+  primary: "bg-[#0057B8] text-white hover:bg-[#004a9e]",
 }
 
 const sizeClass: Record<ButtonSize, string> = {

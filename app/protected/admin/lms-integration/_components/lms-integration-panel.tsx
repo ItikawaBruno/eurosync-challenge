@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Spinner } from "@heroui/react"
 import { Button } from "@/components/platform/ui/button"
 import { RefreshCw, RotateCcw } from "lucide-react"
 import { useLmsOverview, useLmsSyncAll, useLmsReset } from "@/hooks/use-lms"
@@ -35,7 +34,7 @@ export function LmsIntegrationPanel() {
           onClick={() => syncAll.mutate()}
           disabled={syncAll.isPending}
         >
-          {syncAll.isPending ? <Spinner size="sm" /> : <RefreshCw className="h-4 w-4" />}
+          {syncAll.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
           {syncAll.isPending ? "Sincronizando..." : "Sincronizar tudo"}
         </Button>
         <Button

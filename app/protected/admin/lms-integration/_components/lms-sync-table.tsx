@@ -1,4 +1,3 @@
-import { Spinner } from "@heroui/react"
 import { Button } from "@/components/platform/ui/button"
 import { RefreshCw, Eye } from "lucide-react"
 import { SectionCard } from "@/components/platform/ui/card"
@@ -98,7 +97,7 @@ export function LmsSyncTable({
                       onClick={() => syncEntity.mutate(entity)}
                       disabled={syncEntity.isPending}
                     >
-                      {syncEntity.isPending ? <Spinner size="sm" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                      {syncEntity.isPending ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
                       Sincronizar
                     </Button>
                   </div>

@@ -1,3 +1,5 @@
+"use client"
+
 import { Card } from "@/components/platform/ui/card"
 import { StatusBadge } from "@/components/platform/ui/status-badge"
 import { useClass } from "@/hooks/use-classes"

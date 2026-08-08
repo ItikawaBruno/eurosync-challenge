@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: euro_sync
+      POSTGRES_PASSWORD: euro_sync
+      POSTGRES_DB: euro_sync
+    ports:
+      - "5432:5432"
+    volumes:
+      - euro_sync_pgdata:/var/lib/postgresql/data
+
+volumes:
+  euro_sync_pgdata:

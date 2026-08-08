@@ -1,3 +1,5 @@
+"use client"
+
 import { MapPin } from "lucide-react"
 import { SectionCard } from "@/components/platform/ui/card"
 import { StatusBadge } from "@/components/platform/ui/status-badge"
@@ -38,4 +40,5 @@ export function ScheduleList() {
     </SectionCard>
   )
 }
+
 

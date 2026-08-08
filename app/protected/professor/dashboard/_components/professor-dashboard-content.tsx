@@ -1,3 +1,5 @@
+"use client"
+
 import { AlertTriangle, CalendarDays, ClipboardCheck, School } from "lucide-react"
 import { MetricCard } from "@/components/platform/ui/metric-card"
 import { SectionCard } from "@/components/platform/ui/card"
@@ -63,4 +65,5 @@ export function ProfessorDashboardContent() {
     </div>
   )
 }
+
 

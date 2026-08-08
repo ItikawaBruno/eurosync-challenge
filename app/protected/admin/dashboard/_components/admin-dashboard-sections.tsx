@@ -1,3 +1,5 @@
+"use client"
+
 import { CalendarDays, PlugZap } from "lucide-react"
 import { AttendanceLineChart, EngagementBarChart } from "@/components/platform/charts/platform-charts"
 import { SectionCard } from "@/components/platform/ui/card"
@@ -83,4 +85,5 @@ export function AdminDashboardSections() {
     </div>
   )
 }
+
 

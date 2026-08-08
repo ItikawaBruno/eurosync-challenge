@@ -18,7 +18,7 @@ const toneMap: Record<string, string> = {
 }
 
 export function StatusBadge({ label, className = "", tone }: StatusBadgeProps) {
-  const toneClass = tone ? toneMap[tone] ?? toneMap.default : toneMap[label] ?? toneMap.default
+  const toneClass = tone ? toneMap[tone] ?? toneMap.default : toneMap[label ?? ""] ?? toneMap.default
   return <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${toneClass} ${className}`.trim()}>{label}</span>
 }
 

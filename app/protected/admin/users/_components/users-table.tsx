@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Eye, Pencil, UserMinus } from "lucide-react"
-import { Select, SelectPopover, ListBox, ListBoxItem } from "@heroui/react"
 import { DataTable, type Column } from "@/components/platform/ui/data-table"
 import { Button } from "@/components/platform/ui/button"
 import { RoleBadge, StatusBadge } from "@/components/platform/ui/status-badge"
@@ -14,13 +13,14 @@ import type { UserRole } from "@/types/platform"
 
 type ApiUser = { id: string; name: string; email: string; role: string; isActive: boolean }
 
-export function UsersTable({ createModalState }: { createModalState: OverlayState }) {
+export function UsersTable() {
   const [roleFilter, setRoleFilter] = useState<UserRole | undefined>()
   const [search, setSearch] = useState("")
   const [selected, setSelected] = useState<ApiUser | null>(null)
 
   const editModal = useOverlayState()
   const deleteModal = useOverlayState()
+  const createModalState = useOverlayState()
 
   const { data: users, isPending } = useUsers(roleFilter)
   const createUser = useCreateUser()
@@ -44,7 +44,7 @@ export function UsersTable({ createModalState }: { createModalState: OverlayStat
   const handleCreate = () => {
     if (!createName.trim() || !createEmail.trim()) return
     createUser.mutate(
-      { id: `user_${Date.now()}`, name: createName, email: createEmail, role: createRole },
+      { name: createName, email: createEmail, role: createRole },
       { onSuccess: () => { setCreateName(""); setCreateEmail(""); setCreateRole("STUDENT"); createModalState.close() } },
     )
   }
@@ -77,21 +77,17 @@ export function UsersTable({ createModalState }: { createModalState: OverlayStat
             onChange={(e) => setSearch(e.target.value)}
             className="md:max-w-sm"
           />
-          <Select
+          <select
             aria-label="Filtrar por perfil"
-            selectedKey={roleFilter ?? "ALL"}
-            onSelectionChange={(key) => setRoleFilter(key === "ALL" ? undefined : key as UserRole)}
+            value={roleFilter ?? "ALL"}
+            onChange={(e) => setRoleFilter(e.target.value === "ALL" ? undefined : e.target.value as UserRole)}
+            className="min-w-[140px] rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
           >
-            <Select.Trigger className="min-w-[140px]" />
-            <SelectPopover>
-              <ListBox>
-                <ListBoxItem id="ALL">Todos</ListBoxItem>
-                <ListBoxItem id="ADMIN">Admin</ListBoxItem>
-                <ListBoxItem id="PROFESSOR">Professor</ListBoxItem>
-                <ListBoxItem id="STUDENT">Aluno</ListBoxItem>
-              </ListBox>
-            </SelectPopover>
-          </Select>
+            <option value="ALL">Todos</option>
+            <option value="ADMIN">Admin</option>
+            <option value="PROFESSOR">Professor</option>
+            <option value="STUDENT">Aluno</option>
+          </select>
         </div>
         {isPending
           ? <TableSkeleton rows={6} />
@@ -120,19 +116,15 @@ export function UsersTable({ createModalState }: { createModalState: OverlayStat
           </label>
           <label className="grid gap-2 text-sm">
             <span className="font-medium">Perfil</span>
-            <Select
-              selectedKey={createRole}
-              onSelectionChange={(key) => setCreateRole(key as UserRole)}
+            <select
+              value={createRole}
+              onChange={(e) => setCreateRole(e.target.value as UserRole)}
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800"
             >
-              <Select.Trigger />
-              <SelectPopover>
-                <ListBox>
-                  <ListBoxItem id="ADMIN">Admin</ListBoxItem>
-                  <ListBoxItem id="PROFESSOR">Professor</ListBoxItem>
-                  <ListBoxItem id="STUDENT">Aluno</ListBoxItem>
-                </ListBox>
-              </SelectPopover>
-            </Select>
+              <option value="ADMIN">Admin</option>
+              <option value="PROFESSOR">Professor</option>
+              <option value="STUDENT">Aluno</option>
+            </select>
           </label>
         </div>
       </AppModal>

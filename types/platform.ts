@@ -6,4 +6,5 @@ export type ApiUser = {
   email: string
   role: UserRole
   status?: string
+  isActive: boolean
 }

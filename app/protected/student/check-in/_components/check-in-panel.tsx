@@ -59,6 +59,7 @@ export function CheckInPanel() {
       {
         lessonId: openLesson.id,
         checkinMethod: "QR_CODE",
+        qrCodeToken,
       },
       { onSuccess: () => { setQrCodeToken(""); qrcodeModal.close() } },
     )

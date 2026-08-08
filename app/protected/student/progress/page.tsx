@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/platform/layout/page-header"
-import { ProgressPanel } from "./-components/progress-panel"
+import { ProgressPanel } from "./_components/progress-panel"
 
 export default function StudentProgressPage() {
   return (

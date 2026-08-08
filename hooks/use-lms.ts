@@ -1,64 +1,5 @@
-export function useLmsOverview() {
-  return {
-    data: {
-      syncs: 3,
-      pending: 1,
-      courses: { count: 8, lastSync: "2024-05-12T09:30:00.000Z", status: "success" },
-      classes: { count: 12, lastSync: "2024-05-10T15:00:00.000Z", status: "success" },
-      students: { count: 320, lastSync: "2024-05-12T08:45:00.000Z", status: "success" },
-      professors: { count: 18, lastSync: "2024-05-11T10:15:00.000Z", status: "success" },
-      enrollments: { count: 280, lastSync: "2024-05-12T09:20:00.000Z", status: "success" },
-      progress: { count: 1250, lastSync: "2024-05-12T09:10:00.000Z", status: "success" },
-      attendance: { count: 640, lastSync: "2024-05-12T09:05:00.000Z", status: "success" },
-      activities: { count: 154, lastSync: "2024-05-11T17:30:00.000Z", status: "success" },
-      grades: { count: 780, lastSync: "2024-05-10T18:20:00.000Z", status: "success" },
-      completions: { count: 90, lastSync: "2024-05-09T12:10:00.000Z", status: "success" },
-    },
-    isPending: false,
-  }
-}
-
-export function useLmsSyncAll() {
-  return {
-    mutate: (_payload?: any, options?: { onSuccess?: () => void }) => options?.onSuccess?.(),
-    isPending: false,
-  }
-}
-
-export function useLmsReset() {
-  return {
-    mutate: (_payload?: any, options?: { onSuccess?: () => void }) => options?.onSuccess?.(),
-    isPending: false,
-  }
-}
-
-export function useLmsLogs() {
-  return {
-    data: [
-      {
-        id: "1",
-        timestamp: "2024-05-12T09:30:00.000Z",
-        action: "full_sync",
-        entity: "courses",
-        recordsProcessed: 8,
-        status: "success",
-        message: "Sincronização concluída com sucesso",
-      },
-    ],
-    isPending: false,
-  }
-}
-
-export function useLmsData(_entity: LmsSyncEntity) {
-  return { data: [{ id: "1", name: "Moodle" }], isPending: false }
-}
-
-export function useLmsSyncEntity() {
-  return {
-    mutate: (_payload?: any, options?: { onSuccess?: () => void }) => options?.onSuccess?.(),
-    isPending: false,
-  }
-}
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { apiFetch } from "@/lib/fetcher"
 
 export type LmsSyncEntity =
   | "courses"
@@ -71,3 +12,84 @@ export type LmsSyncEntity =
   | "activities"
   | "grades"
   | "completions"
+
+type EntityState = { count: number; lastSync: string | null; status: string }
+
+type LmsOverview = { syncs: number; pending: number } & Record<LmsSyncEntity, EntityState>
+
+type LmsSyncLog = {
+  id: string
+  timestamp: string
+  action: string
+  entity: string
+  recordsProcessed: number
+  status: string
+  message: string
+}
+
+export function useLmsOverview() {
+  const query = useQuery({
+    queryKey: ["lms", "overview"],
+    queryFn: () => apiFetch<LmsOverview>("/api/lms/overview"),
+  })
+  return { data: query.data, isPending: query.isPending }
+}
+
+export function useLmsSyncAll() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: () => apiFetch("/api/lms/sync-all", { method: "POST" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lms"] })
+    },
+  })
+  return {
+    mutate: (_payload?: unknown, options?: { onSuccess?: () => void }) => mutation.mutate(undefined, options),
+    isPending: mutation.isPending,
+  }
+}
+
+export function useLmsReset() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: () => apiFetch("/api/lms/reset", { method: "POST" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lms"] })
+    },
+  })
+  return {
+    mutate: (_payload?: unknown, options?: { onSuccess?: () => void }) => mutation.mutate(undefined, options),
+    isPending: mutation.isPending,
+  }
+}
+
+export function useLmsLogs() {
+  const query = useQuery({
+    queryKey: ["lms", "logs"],
+    queryFn: () => apiFetch<LmsSyncLog[]>("/api/lms/logs"),
+  })
+  return { data: query.data, isPending: query.isPending }
+}
+
+export function useLmsData(entity: LmsSyncEntity) {
+  const query = useQuery({
+    queryKey: ["lms", "data", entity],
+    queryFn: () => apiFetch<unknown[]>(`/api/lms/data/${entity}`),
+    enabled: Boolean(entity),
+  })
+  return { data: query.data, isPending: query.isPending }
+}
+
+export function useLmsSyncEntity() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: (entity: LmsSyncEntity) => apiFetch(`/api/lms/sync/${entity}`, { method: "POST" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lms"] })
+    },
+  })
+  return {
+    mutate: (entity: LmsSyncEntity, options?: { onSuccess?: () => void }) => mutation.mutate(entity, options),
+    isPending: mutation.isPending,
+  }
+}

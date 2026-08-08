@@ -1,10 +1,12 @@
+"use client"
+
 import { Button } from "@/components/platform/ui/button"
 import { SectionCard } from "@/components/platform/ui/card"
 import { PageSpinner } from "@/components/platform/ui/loading"
 import { useAttendanceByLesson } from "@/hooks/use-attendance"
 
 export function AttendanceControl({ lessonId }: { lessonId: string }) {
-  const { data: attendance, isPending } = useAttendanceByLesson()
+  const { data: attendance, isPending } = useAttendanceByLesson(lessonId)
 
   if (isPending) return <PageSpinner />
 

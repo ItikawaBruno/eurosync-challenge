@@ -1,3 +1,5 @@
+"use client"
+
 import { Download, FileText } from "lucide-react"
 import { MetricCard } from "@/components/platform/ui/metric-card"
 import { Button } from "@/components/platform/ui/button"
@@ -47,3 +49,4 @@ export function ReportsPanel() {
     </div>
   )
 }
+

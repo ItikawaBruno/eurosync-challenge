@@ -1,3 +1,5 @@
+"use client"
+
 import { SectionCard } from "@/components/platform/ui/card"
 import { StatusBadge } from "@/components/platform/ui/status-badge"
 import { TableSkeleton } from "@/components/platform/ui/loading"
@@ -58,3 +60,4 @@ function formatTime(iso: string): string {
     second: "2-digit",
   })
 }
+

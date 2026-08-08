@@ -1,3 +1,5 @@
+"use client"
+
 import { FileSpreadsheet, PlugZap, UploadCloud } from "lucide-react"
 import { Button } from "@/components/platform/ui/button"
 import { SectionCard } from "@/components/platform/ui/card"
@@ -47,3 +49,4 @@ export function ImportsPanel() {
     </div>
   )
 }
+

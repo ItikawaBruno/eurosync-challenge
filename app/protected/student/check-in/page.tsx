@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/platform/layout/page-header"
-import { CheckInPanel } from "./-components/check-in-panel"
+import { CheckInPanel } from "./_components/check-in-panel"
 
 export default function StudentCheckInPage() {
   return (
