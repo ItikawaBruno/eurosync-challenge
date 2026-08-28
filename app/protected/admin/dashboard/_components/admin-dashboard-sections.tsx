@@ -31,7 +31,7 @@ export function AdminDashboardSections() {
             {(alerts ?? []).slice(0, 5).map((alert) => (
               <div className="rounded-xl border bg-slate-50 p-4" key={alert.id}>
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-medium">{alert.message}</p>
+                  <p className="font-medium text-gray-800">{alert.message}</p>
                   <div className="flex items-center gap-2">
                     <StatusBadge label={alert.status === "OPEN" ? "Aberto" : alert.status === "RESOLVED" ? "Resolvido" : "Ignorado"} tone={alert.status === "OPEN" ? "warning" : "success"} />
                     {alert.status === "OPEN" && (
@@ -59,7 +59,7 @@ export function AdminDashboardSections() {
                 <div className="flex gap-3 rounded-xl border p-4" key={cls.id}>
                   <CalendarDays className="mt-0.5 h-5 w-5 text-primary" />
                   <div>
-                    <p className="font-medium">{cls.name}</p>
+                    <p className="font-medium text-gray-800">{cls.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {cls.status} · {(cls as any)._count?.lessons ?? 0} aulas
                     </p>
@@ -72,11 +72,11 @@ export function AdminDashboardSections() {
         <SectionCard title="Resumo do sistema" description="Indicadores globais da plataforma.">
           <div className="grid gap-3">
             <div className="flex items-center justify-between rounded-xl border p-4">
-              <div className="flex gap-3"><PlugZap className="mt-0.5 h-5 w-5 text-primary" /><div><p className="font-medium">Total de aulas</p></div></div>
+              <div className="flex gap-3"><PlugZap className="mt-0.5 h-5 w-5 text-primary" /><div><p className="font-medium text-gray-800">Total de aulas</p></div></div>
               <StatusBadge label={String(dashboard?.totalLessons ?? 0)} />
             </div>
             <div className="flex items-center justify-between rounded-xl border p-4">
-              <div className="flex gap-3"><PlugZap className="mt-0.5 h-5 w-5 text-primary" /><div><p className="font-medium">Alertas abertos</p></div></div>
+              <div className="flex gap-3"><PlugZap className="mt-0.5 h-5 w-5 text-primary" /><div><p className="font-medium text-gray-800">Alertas abertos</p></div></div>
               <StatusBadge label={String(dashboard?.openAlerts ?? 0)} tone="warning" />
             </div>
           </div>
