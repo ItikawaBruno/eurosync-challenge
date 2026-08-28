@@ -33,9 +33,9 @@ export function LmsSyncLogs() {
                   <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
                     {formatTime(log.timestamp)}
                   </td>
-                  <td className="px-4 py-2 capitalize">{log.action.replace("_", " ")}</td>
-                  <td className="px-4 py-2 capitalize">{log.entity}</td>
-                  <td className="px-4 py-2">{log.recordsProcessed}</td>
+                  <td className="px-4 py-2 capitalize text-gray-500">{log.action.replace("_", " ")}</td>
+                  <td className="px-4 py-2 capitalize text-gray-500">{log.entity}</td>
+                  <td className="px-4 py-2 text-gray-500">{log.recordsProcessed}</td>
                   <td className="px-4 py-2">
                     <StatusBadge
                       label={log.status === "success" ? "OK" : log.status === "warning" ? "Alerta" : "Erro"}
