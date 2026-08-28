@@ -23,7 +23,7 @@ export function ProgressPanel() {
         <MetricCard title="Total de aulas" value={String(totalLessons)} description="trilha presencial" icon={<BookOpen className="h-5 w-5" />} />
       </div>
       <SectionCard title="Score de frequencia" description="Indicadores individuais de presenca.">
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3 text-[#0f172b]">
           <Score label="Frequencia" value={`${attendanceRate}%`} />
           <Score label="Presencas" value={String(presentCount)} />
           <Score label="Total de aulas" value={String(totalLessons)} />
