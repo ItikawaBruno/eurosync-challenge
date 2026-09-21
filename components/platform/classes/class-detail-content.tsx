@@ -14,6 +14,7 @@ import { useClass, useClassStudents, useAddClassStudents } from "@/hooks/use-cla
 import { useClassTasks, useCreateTask, useDeleteTask } from "@/hooks/use-tasks"
 import { useClassMetrics } from "@/hooks/use-class-metrics"
 import { useUsers } from "@/hooks/use-user"
+import { ClassLessonsSection } from "@/components/platform/classes/class-lessons-section"
 
 export function ClassDetailContent({ classId }: { classId: string }) {
   const { data: cls } = useClass(classId)
@@ -105,6 +106,8 @@ export function ClassDetailContent({ classId }: { classId: string }) {
         )}
         {!rosterPending && !roster?.length && <p className="mt-3 text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</p>}
       </SectionCard>
+
+      <ClassLessonsSection classId={classId} />
 
       <SectionCard
         title="Tarefas"

@@ -3,12 +3,39 @@ import { apiFetch } from "@/lib/fetcher"
 
 type LessonRecord = {
   id: string
+  classId: string
   title: string
   startsAt: string
   endsAt: string
   status: string
   locationName?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  locationRadiusM?: number | null
+  qrCodeToken?: string | null
 }
+
+type LessonLocation = {
+  locationName?: string
+  locationLat?: number | null
+  locationLng?: number | null
+  locationRadiusM?: number | null
+}
+
+type CreateLessonPayload = {
+  classId: string
+  title: string
+  startsAt: string
+  endsAt: string
+} & LessonLocation
+
+type UpdateLessonPayload = {
+  id: string
+  title?: string
+  startsAt?: string
+  endsAt?: string
+  status?: string
+} & LessonLocation
 
 export function useLessons(classId?: string) {
   const query = useQuery({
@@ -30,15 +57,13 @@ export function useLesson(id: string) {
 export function useCreateLesson() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (payload: { classId: string; title: string; startsAt: string; endsAt: string; locationName?: string }) =>
+    mutationFn: (payload: CreateLessonPayload) =>
       apiFetch<LessonRecord>("/api/lessons", { method: "POST", body: JSON.stringify(payload) }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["lessons"] }),
   })
   return {
-    mutate: (
-      payload: { classId: string; title: string; startsAt: string; endsAt: string; locationName?: string },
-      options?: { onSuccess?: () => void },
-    ) => mutation.mutate(payload, options),
+    mutate: (payload: CreateLessonPayload, options?: { onSuccess?: () => void }) =>
+      mutation.mutate(payload, options),
     isPending: mutation.isPending,
   }
 }
@@ -58,15 +83,17 @@ export function useDeleteLesson() {
 export function useUpdateLesson() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (payload: { id: string; title?: string; startsAt?: string; endsAt?: string; status?: string; locationName?: string }) =>
+    mutationFn: (payload: UpdateLessonPayload) =>
       apiFetch<LessonRecord>(`/api/lessons/${payload.id}`, { method: "PATCH", body: JSON.stringify(payload) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["lessons"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lessons"] })
+      queryClient.invalidateQueries({ queryKey: ["attendance"] })
+      queryClient.invalidateQueries({ queryKey: ["alerts"] })
+    },
   })
   return {
-    mutate: (
-      payload: { id: string; title?: string; startsAt?: string; endsAt?: string; status?: string; locationName?: string },
-      options?: { onSuccess?: () => void },
-    ) => mutation.mutate(payload, options),
+    mutate: (payload: UpdateLessonPayload, options?: { onSuccess?: () => void }) =>
+      mutation.mutate(payload, options),
     isPending: mutation.isPending,
   }
 }

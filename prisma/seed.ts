@@ -101,11 +101,15 @@ async function main() {
   const now = new Date()
   const lessons = []
   for (let i = 0; i < 3; i++) {
-    const startsAt = new Date(now)
-    startsAt.setDate(now.getDate() - (2 - i))
-    startsAt.setHours(8, 0, 0, 0)
-    const endsAt = new Date(startsAt)
-    endsAt.setHours(9, 0, 0, 0)
+    const isCurrent = i === 2
+    // A última aula fica acontecendo agora para que o check-in seja testável logo após o seed.
+    const startsAt = isCurrent ? new Date(now.getTime() - 15 * 60_000) : new Date(now)
+    if (!isCurrent) {
+      startsAt.setDate(now.getDate() - (2 - i))
+      startsAt.setHours(8, 0, 0, 0)
+    }
+    const endsAt = isCurrent ? new Date(now.getTime() + 90 * 60_000) : new Date(startsAt)
+    if (!isCurrent) endsAt.setHours(9, 0, 0, 0)
 
     const lesson = await prisma.lesson.upsert({
       where: { id: `seed-lesson-a-${i}` },
@@ -120,7 +124,8 @@ async function main() {
         locationName: "Sala 12",
         locationLat: -23.5505,
         locationLng: -46.6333,
-        qrCodeToken: "EURO-SYNC-DEMO",
+        locationRadiusM: 150,
+        qrCodeToken: "EURODEMO",
       },
     })
     lessons.push(lesson)

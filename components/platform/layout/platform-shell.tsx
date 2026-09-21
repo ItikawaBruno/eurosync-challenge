@@ -1,15 +1,11 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { usePathname } from "next/navigation"
 import { AppHeader } from "@/components/platform/layout/app-header"
 import { AppSidebar } from "@/components/platform/layout/app-sidebar"
-import { roleFromPath } from "@/lib/platform-auth"
+import type { UserRole } from "@/types/platform"
 
-export function PlatformShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
-  const role = roleFromPath(pathname ?? "")
-
+export function PlatformShell({ role, children }: { role: UserRole; children: ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <AppSidebar role={role} />

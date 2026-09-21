@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/fetcher"
 
-type AttendanceByLesson = { id: string; student: { id: string; name: string }; status: string }
+type AttendanceByLesson = {
+  id: string
+  student: { id: string; name: string }
+  status: string
+  checkinMethod: string | null
+  checkedInAt: string | null
+}
 type AttendanceByStudent = { id: string; status: string; date: string }
 
 export function useAttendanceByLesson(lessonId: string) {
@@ -45,9 +51,14 @@ export function useCheckIn() {
       longitude?: number
       qrCodeToken?: string
     }) => apiFetch("/api/attendance/checkin", { method: "POST", body: JSON.stringify(payload) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendance"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+    },
   })
   return {
+    error: mutation.error,
+    reset: mutation.reset,
     mutate: (
       payload: {
         lessonId: string

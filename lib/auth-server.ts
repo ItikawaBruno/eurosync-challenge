@@ -89,3 +89,17 @@ export async function requireClassManage(classId: string) {
 
   throw new ForbiddenError()
 }
+
+export async function requireLessonManage(lessonId: string) {
+  const user = await requireUser()
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    select: { id: true, classId: true, class: { select: { teacherId: true } } },
+  })
+  if (!lesson) throw new ForbiddenError()
+
+  if (user.role === "ADMIN") return { user, lesson }
+  if (user.role === "PROFESSOR" && lesson.class.teacherId === user.id) return { user, lesson }
+
+  throw new ForbiddenError()
+}

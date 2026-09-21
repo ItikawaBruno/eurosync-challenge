@@ -173,6 +173,7 @@ model Lesson {
   locationName  String?
   locationLat   Float?
   locationLng   Float?
+  locationRadiusM Int?
   qrCodeToken   String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt

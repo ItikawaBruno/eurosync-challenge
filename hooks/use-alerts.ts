@@ -32,3 +32,34 @@ export function useUpdateAlert() {
     isPending: mutation.isPending,
   }
 }
+
+type GenerateResult = { created: number; resolved: number; evaluated: number }
+
+export function useGenerateAlerts() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: () => apiFetch<GenerateResult>("/api/alerts/generate", { method: "POST" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["alerts"] }),
+  })
+  return {
+    mutate: (options?: { onSuccess?: (result: GenerateResult) => void; onError?: (error: Error) => void }) =>
+      mutation.mutate(undefined, options),
+    isPending: mutation.isPending,
+  }
+}
+
+export function useCreateAlert() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: (payload: { type: string; severity: string; message: string; studentId?: string; classId?: string }) =>
+      apiFetch<AlertRecord>("/api/alerts", { method: "POST", body: JSON.stringify(payload) }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["alerts"] }),
+  })
+  return {
+    mutate: (
+      payload: { type: string; severity: string; message: string; studentId?: string; classId?: string },
+      options?: { onSuccess?: () => void },
+    ) => mutation.mutate(payload, options),
+    isPending: mutation.isPending,
+  }
+}

@@ -1,3 +1,12 @@
+// Atraso conta como comparecimento; falta justificada sai do cálculo em vez de penalizar.
+export function countsAsAttended(status: string) {
+  return status === "PRESENT" || status === "LATE"
+}
+
+function scored<T extends { status: string }>(records: T[]) {
+  return records.filter((r) => r.status !== "JUSTIFIED")
+}
+
 export function monthlyAttendanceSeries(
   records: Array<{ status: string; lessonStartsAt: Date }>,
   months = 5,
@@ -16,13 +25,13 @@ export function monthlyAttendanceSeries(
     })
   }
 
-  for (const record of records) {
+  for (const record of scored(records)) {
     const bucket = buckets.find(
       (b) => b.year === record.lessonStartsAt.getFullYear() && b.month === record.lessonStartsAt.getMonth(),
     )
     if (!bucket) continue
     bucket.total += 1
-    if (record.status === "PRESENT") bucket.present += 1
+    if (countsAsAttended(record.status)) bucket.present += 1
   }
 
   return buckets.map((b) => ({
@@ -32,7 +41,8 @@ export function monthlyAttendanceSeries(
 }
 
 export function attendanceRate(records: Array<{ status: string }>) {
-  if (records.length === 0) return 0
-  const present = records.filter((r) => r.status === "PRESENT").length
-  return Math.round((present / records.length) * 100)
+  const considered = scored(records)
+  if (considered.length === 0) return 0
+  const present = considered.filter((r) => countsAsAttended(r.status)).length
+  return Math.round((present / considered.length) * 100)
 }

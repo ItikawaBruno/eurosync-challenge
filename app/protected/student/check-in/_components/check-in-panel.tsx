@@ -23,6 +23,7 @@ export function CheckInPanel() {
   const [checkinMethod, setCheckinMethod] = useState<"LOCATION" | "QR_CODE">("LOCATION")
 
   const openLesson = (lessons ?? []).find((l) => l.status === "OPEN") ?? lessons?.[0]
+  const checkInError = checkIn.error?.message ?? null
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -42,6 +43,7 @@ export function CheckInPanel() {
 
   const handleConfirmLocation = () => {
     if (!openLesson || !latitude || !longitude) return
+    checkIn.reset()
     checkIn.mutate(
       {
         lessonId: openLesson.id,
@@ -55,6 +57,7 @@ export function CheckInPanel() {
 
   const handleConfirmQRCode = () => {
     if (!openLesson || !qrCodeToken.trim()) return
+    checkIn.reset()
     checkIn.mutate(
       {
         lessonId: openLesson.id,
@@ -75,7 +78,7 @@ export function CheckInPanel() {
                 {locationAvailable ? (
                   <div className="rounded-xl border bg-green-50 p-4 text-green-800">
                     <CheckCircle2 className="mb-2 h-5 w-5" />
-                    Dentro do local permitido para confirmacao de presenca.
+                    Localizacao capturada. A distancia ate o local da aula sera validada na confirmacao.
                   </div>
                 ) : (
                   <div className="rounded-xl border bg-amber-50 p-4 text-amber-800">
@@ -144,6 +147,9 @@ export function CheckInPanel() {
           <p className="text-sm text-muted-foreground">
             Voce esta confirmando presenca em <strong>{openLesson?.title}</strong> usando sua localização.
           </p>
+          {checkInError && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{checkInError}</div>
+          )}
           {latitude && longitude && (
             <div className="rounded-lg bg-slate-50 p-3">
               <p className="text-xs font-medium text-muted-foreground">Coordenadas capturadas:</p>
@@ -170,6 +176,9 @@ export function CheckInPanel() {
           <p className="text-sm text-muted-foreground">
             Digite o codigo QR exibido pelo professor para <strong>{openLesson?.title}</strong>.
           </p>
+          {checkInError && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{checkInError}</div>
+          )}
           <label className="grid gap-2 text-sm">
             <span className="font-medium">Codigo QR</span>
             <Input
