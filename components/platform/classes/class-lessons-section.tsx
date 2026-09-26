@@ -103,7 +103,7 @@ export function ClassLessonsSection({ classId }: { classId: string }) {
                     tone={lesson.status === "OPEN" ? "success" : "default"}
                   />
                   <Link
-                    href={`/protected/professor/lessons/${lesson.id}/attendance`}
+                    href={`/professor/lessons/${lesson.id}/attendance`}
                     className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     Chamada

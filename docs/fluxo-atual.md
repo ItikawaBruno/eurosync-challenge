@@ -11,9 +11,9 @@ app/
   layout.tsx                     ClerkProvider + QueryProvider (root)
   page.tsx                       Landing pública
   auth/candidate/sign-in/...     Tela de login (Clerk <SignIn/>)
-  protected/
+  pos-login/page.tsx             Destino do Clerk: resolve o role e redireciona ao dashboard
+  (protected)/                   Route group: NÃO aparece na URL
     layout.tsx                   Guarda de sessão (redireciona se não logado) + PlatformShell
-    page.tsx                     Index: resolve o role e redireciona para o dashboard correto
     admin/...                    dashboard, classes, users, alerts, imports, lms-integration, reports
     professor/...                dashboard, classes, alerts, lessons/[id]/attendance, students/[id]
     student/...                  dashboard, classes, check-in, schedule, progress, notifications
@@ -23,17 +23,33 @@ components/platform/...          UI (sidebar, header, charts, telas de turma)
 hooks/                           Hooks React Query que consomem /api/*
 lib/
   auth-server.ts                 requireUser / requireRole / requireClassAccess / requireClassManage
-  platform-auth.ts               roleFromPath (deriva role a partir da URL — só para exibição/menu)
+  route-guard.tsx                guardRoleSegment (guarda de role por segmento de rota)
   clerk-provision.ts             provisionClerkUser / syncClerkRole / normalizeRole
   platform-navigation.tsx        navItems, roleHome, roleLabel
   attendance-stats.ts            cálculo de frequência
   task-stats.ts                  cálculo de adesão (tarefas + frequência)
   csv.ts                         parser de CSV para importação de usuários
-proxy.ts                         clerkMiddleware() do Next.js (faz o papel de middleware.ts)
+proxy.ts                         clerkMiddleware() + allowlist de rotas públicas (faz o papel de middleware.ts)
 prisma/schema.prisma             schema do banco
 ```
 
-> **Ponto de atenção arquitetural**: `proxy.ts` (equivalente ao `middleware.ts`) só inicializa o contexto de autenticação do Clerk — não faz checagem de role nenhuma. O menu lateral e o "role atual" exibido na UI são derivados **da URL** (`roleFromPath`), não da sessão real do usuário. A autorização de verdade acontece só na camada de API (Server Actions/route handlers), via `requireRole`/`requireClassAccess`/`requireClassManage`. Ou seja: um aluno pode navegar manualmente até `/protected/admin/dashboard` e ver o layout "de admin" renderizado, mas todas as chamadas de dados retornarão 403.
+> **Nota arquitetural — as três camadas de autorização**:
+>
+> 1. `proxy.ts` (equivalente ao `middleware.ts`) exige sessão para tudo que não
+>    estiver na allowlist de rotas públicas (`/` e `/auth/candidate/sign-in`).
+>    As rotas de `/api` ficam **de fora** do `auth.protect()` de propósito:
+>    `protect()` responde com redirect, e cliente de API espera 401/403 em JSON.
+> 2. Os segmentos `admin`, `professor` e `student` têm cada um seu `layout.tsx`
+>    com `guardRoleSegment`, que lê o role da **sessão** (via `requireUser()`) e
+>    redireciona para o dashboard do role real se não bater. O role **não** é mais
+>    derivado da URL (`roleFromPath` foi removido).
+> 3. A autorização de dados fica na camada de API, via
+>    `requireRole`/`requireClassAccess`/`requireClassManage`, com `withApi`
+>    traduzindo para 401/403.
+>
+> O segmento `/protected` foi removido da URL por um route group `app/(protected)`.
+> Como o prefixo comum deixou de existir, a allowlist do `proxy.ts` é o que garante
+> que uma rota nova nasça privada por padrão.
 
 ---
 
@@ -57,15 +73,15 @@ Definidos em `prisma/schema.prisma` (enum `UserRole`):
    - `POST /api/users` — criação individual de usuário.
    - `POST /api/users/import` — importação em massa via CSV.
    - Ambos passam por `provisionClerkUser`: procura o usuário por e-mail (Prisma e depois Clerk); se não existir, cria no Clerk **sem senha** (`skipPasswordRequirement: true`, provavelmente com convite/passwordless) e grava o role em `publicMetadata.role`.
-3. Após login bem-sucedido, o Clerk redireciona para `/protected`.
-4. `app/protected/layout.tsx` checa a sessão; sem `userId`, redireciona de volta ao login.
-5. `app/protected/page.tsx` chama `requireUser()`:
+3. Após login bem-sucedido, o Clerk redireciona para `/pos-login` (`fallbackRedirectUrl`).
+4. `app/(protected)/layout.tsx` checa a sessão; sem `userId`, redireciona de volta ao login.
+5. `app/pos-login/page.tsx` chama `requireUser()`:
    - Busca o usuário no Postgres por `clerkId`.
    - Se ainda não existir localmente (primeiro acesso), provisiona: lê o Clerk `currentUser()`, extrai nome/e-mail, resolve o role a partir de `publicMetadata.role` (ou `ADMIN` se o e-mail bater com `SEED_ADMIN_EMAIL`, senão `STUDENT` por padrão), grava no Postgres e sincroniza de volta para o Clerk.
 6. Com o role resolvido, o usuário é redirecionado para seu dashboard (`roleHome`):
-   - ADMIN → `/protected/admin/dashboard`
-   - PROFESSOR → `/protected/professor/dashboard`
-   - STUDENT (e PARENT) → `/protected/student/dashboard`
+   - ADMIN → `/admin/dashboard`
+   - PROFESSOR → `/professor/dashboard`
+   - STUDENT (e PARENT) → `/student/dashboard`
 
 ---
 
@@ -75,28 +91,28 @@ Definidos em `prisma/schema.prisma` (enum `UserRole`):
 |---|---|---|
 | `/` | Landing pública | pública |
 | `/auth/candidate/sign-in` | Login | pública |
-| `/protected` | Redireciona para o dashboard do role | sessão válida |
-| `/protected/admin/dashboard` | KPIs gerais (alunos, turmas, frequência média, alertas abertos) | ADMIN |
-| `/protected/admin/classes` | Lista/CRUD de turmas | GET livre; criar/editar ADMIN/PROFESSOR; deletar ADMIN |
-| `/protected/admin/classes/[id]` | Detalhe da turma (roster, tarefas, métricas) | dono da turma ou ADMIN |
-| `/protected/admin/users` | CRUD de usuários | ADMIN |
-| `/protected/admin/alerts` | Todos os alertas | leitura geral; ação varia por role |
-| `/protected/admin/imports` | Importação CSV de usuários | ADMIN |
-| `/protected/admin/lms-integration` | Painel de integração LMS (simulada) | ADMIN |
-| `/protected/admin/reports` | Relatórios agregados | ADMIN |
-| `/protected/professor/dashboard` | KPIs do professor | PROFESSOR |
-| `/protected/professor/classes` | Turmas do professor | PROFESSOR |
-| `/protected/professor/classes/[id]` | Detalhe da turma | dono da turma ou ADMIN |
-| `/protected/professor/alerts` | Alertas das turmas do professor | PROFESSOR |
-| `/protected/professor/lessons/[id]/attendance` | Controle de presença de uma aula | ADMIN, PROFESSOR |
-| `/protected/professor/students/[id]` | Perfil de um aluno | ADMIN, PROFESSOR |
-| `/protected/student/dashboard` | Próxima aula, frequência, alertas | STUDENT |
-| `/protected/student/classes` | Turmas em que o aluno está matriculado | STUDENT |
-| `/protected/student/classes/[id]` | Detalhe da turma (tarefas + métricas pessoais) | aluno matriculado |
-| `/protected/student/check-in` | Confirmar presença (localização ou QR code) | STUDENT |
-| `/protected/student/schedule` | Agenda de aulas | STUDENT |
-| `/protected/student/progress` | Progresso/frequência pessoal | STUDENT |
-| `/protected/student/notifications` | Avisos/alertas do aluno | STUDENT |
+| `/pos-login` | Redireciona para o dashboard do role | sessão válida |
+| `/admin/dashboard` | KPIs gerais (alunos, turmas, frequência média, alertas abertos) | ADMIN |
+| `/admin/classes` | Lista/CRUD de turmas | GET livre; criar/editar ADMIN/PROFESSOR; deletar ADMIN |
+| `/admin/classes/[id]` | Detalhe da turma (roster, tarefas, métricas) | dono da turma ou ADMIN |
+| `/admin/users` | CRUD de usuários | ADMIN |
+| `/admin/alerts` | Todos os alertas | leitura geral; ação varia por role |
+| `/admin/imports` | Importação CSV de usuários | ADMIN |
+| `/admin/lms-integration` | Painel de integração LMS (simulada) | ADMIN |
+| `/admin/reports` | Relatórios agregados | ADMIN |
+| `/professor/dashboard` | KPIs do professor | PROFESSOR |
+| `/professor/classes` | Turmas do professor | PROFESSOR |
+| `/professor/classes/[id]` | Detalhe da turma | dono da turma ou ADMIN |
+| `/professor/alerts` | Alertas das turmas do professor | PROFESSOR |
+| `/professor/lessons/[id]/attendance` | Controle de presença de uma aula | ADMIN, PROFESSOR |
+| `/professor/students/[id]` | Perfil de um aluno | ADMIN, PROFESSOR |
+| `/student/dashboard` | Próxima aula, frequência, alertas | STUDENT |
+| `/student/classes` | Turmas em que o aluno está matriculado | STUDENT |
+| `/student/classes/[id]` | Detalhe da turma (tarefas + métricas pessoais) | aluno matriculado |
+| `/student/check-in` | Confirmar presença (localização ou QR code) | STUDENT |
+| `/student/schedule` | Agenda de aulas | STUDENT |
+| `/student/progress` | Progresso/frequência pessoal | STUDENT |
+| `/student/notifications` | Avisos/alertas do aluno | STUDENT |
 
 ---
 
@@ -185,7 +201,7 @@ Definidos em `prisma/schema.prisma` (enum `UserRole`):
 | # | Ponto | Status |
 |---|---|---|
 | 1 | Autorização granular em Aulas/Presença | **Resolvido** — `requireLessonManage` em `lib/auth-server.ts` confirma a posse da turma em `PATCH/DELETE /api/lessons/[id]` e nas rotas de presença; `POST /api/lessons` usa `requireClassManage`. |
-| 2 | Menu/sidebar derivado da URL | **Resolvido** — `roleFromPath` foi removido; o role vem de `requireUser()` no `app/protected/layout.tsx`, e cada segmento (`admin`, `professor`, `student`) tem layout com `guardRoleSegment`, que redireciona para o dashboard do role real. |
+| 2 | Menu/sidebar derivado da URL | **Resolvido** — `roleFromPath` foi removido; o role vem de `requireUser()` no `app/(protected)/layout.tsx`, e cada segmento (`admin`, `professor`, `student`) tem layout com `guardRoleSegment`, que redireciona para o dashboard do role real. |
 | 3 | Role PARENT | **Pendente** — continua sem tela/menu próprios; hoje é tratado como STUDENT (somente leitura pelas rotas). |
 | 4 | Alertas não gerados automaticamente | **Resolvido** — `lib/alert-rules.ts` avalia frequência, faltas consecutivas, entrega de tarefas e queda de frequência mês a mês. Roda em `POST /api/alerts/generate` (botão "Gerar alertas") e automaticamente ao encerrar uma chamada. Cria alertas novos e encerra os que deixaram de se aplicar. |
 | 5 | Check-in sem validação geográfica | **Resolvido** — `POST /api/attendance/checkin` valida matrícula, chamada aberta, janela da aula e distância (Haversine, `lib/geo.ts`) contra `locationRadiusM` da aula; atraso acima de 10 min registra `LATE`. |

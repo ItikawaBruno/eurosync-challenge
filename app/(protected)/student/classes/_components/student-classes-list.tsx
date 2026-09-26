@@ -32,7 +32,7 @@ export function StudentClassesList() {
           <dl className="mt-5 grid gap-3 text-sm">
             <div className="flex justify-between"><dt className="text-muted-foreground">Professor</dt><dd className="font-medium">{cls.teacher?.name ?? "-"}</dd></div>
           </dl>
-          <Link href={`/protected/student/classes/${cls.id}`} className="mt-5 flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">Ver tarefas<ArrowRight className="ml-2 h-4 w-4" /></Link>
+          <Link href={`/student/classes/${cls.id}`} className="mt-5 flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">Ver tarefas<ArrowRight className="ml-2 h-4 w-4" /></Link>
         </Card>
       ))}
       {!classes?.length && (

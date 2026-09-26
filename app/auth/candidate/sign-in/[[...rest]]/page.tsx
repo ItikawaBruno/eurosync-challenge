@@ -8,7 +8,7 @@ export default function CandidateSignInPage() {
       <SignIn
         path="/auth/candidate/sign-in"
         routing="path"
-        fallbackRedirectUrl="/protected"
+        fallbackRedirectUrl="/pos-login"
       />
     </div>
   )

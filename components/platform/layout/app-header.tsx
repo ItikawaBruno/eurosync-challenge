@@ -11,7 +11,6 @@ function breadcrumbFromPath(pathname: string) {
   return pathname
     .split("/")
     .filter(Boolean)
-    .filter((part) => part !== "protected")
     .map((part) => part.replace(/-/g, " "))
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
 }

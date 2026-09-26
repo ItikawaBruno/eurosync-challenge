@@ -92,7 +92,7 @@ export function AdminClassesList() {
               <Button className="flex-1" variant="outline" size="sm" onClick={() => openEditModal(cls)}>Editar</Button>
               <Button className="flex-1 text-red-600" variant="outline" size="sm" onClick={() => openDeleteModal(cls)}>Deletar</Button>
             </div>
-            <Link href={`/protected/admin/classes/${cls.id}`} className="mt-3 flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50" >Abrir detalhes<ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link href={`/admin/classes/${cls.id}`} className="mt-3 flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50" >Abrir detalhes<ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Card>
         ))}
         <Card className="flex min-h-72 flex-col items-center justify-center border-dashed p-6 text-center">
