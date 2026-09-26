@@ -27,7 +27,11 @@ export function useCreateTask() {
   const mutation = useMutation({
     mutationFn: (payload: { classId: string; title: string; description?: string; dueDate?: string }) =>
       apiFetch<ClassTask>(`/api/classes/${payload.classId}/tasks`, { method: "POST", body: JSON.stringify(payload) }),
-    onSuccess: (_data, variables) => queryClient.invalidateQueries({ queryKey: ["tasks", variables.classId] }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", variables.classId] })
+      queryClient.invalidateQueries({ queryKey: ["classes", variables.classId, "metrics"] })
+      queryClient.invalidateQueries({ queryKey: ["classes", variables.classId] })
+    },
   })
   return {
     mutate: (payload: { classId: string; title: string; description?: string; dueDate?: string }, options?: { onSuccess?: () => void }) =>
@@ -40,7 +44,11 @@ export function useDeleteTask(classId: string) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: (id: string) => apiFetch<{ ok: true }>(`/api/tasks/${id}`, { method: "DELETE" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks", classId] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", classId] })
+      queryClient.invalidateQueries({ queryKey: ["classes", classId, "metrics"] })
+      queryClient.invalidateQueries({ queryKey: ["classes", classId] })
+    },
   })
   return {
     mutate: (id: string, options?: { onSuccess?: () => void }) => mutation.mutate(id, options),
@@ -52,7 +60,11 @@ export function useSubmitTask(classId: string) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: (taskId: string) => apiFetch(`/api/tasks/${taskId}/submit`, { method: "POST" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks", classId] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", classId] })
+      queryClient.invalidateQueries({ queryKey: ["classes", classId, "metrics"] })
+      queryClient.invalidateQueries({ queryKey: ["classes", classId] })
+    },
   })
   return {
     mutate: (taskId: string, options?: { onSuccess?: () => void }) => mutation.mutate(taskId, options),
@@ -64,7 +76,11 @@ export function useUnsubmitTask(classId: string) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: (taskId: string) => apiFetch(`/api/tasks/${taskId}/submit`, { method: "DELETE" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks", classId] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", classId] })
+      queryClient.invalidateQueries({ queryKey: ["classes", classId, "metrics"] })
+      queryClient.invalidateQueries({ queryKey: ["classes", classId] })
+    },
   })
   return {
     mutate: (taskId: string, options?: { onSuccess?: () => void }) => mutation.mutate(taskId, options),

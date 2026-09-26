@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireClassAccess, requireClassManage } from "@/lib/auth-server"
 import { withApi } from "@/lib/api"
 import { prisma } from "@/lib/prisma"
+import { parseDateOnly } from "@/lib/period"
 
 export async function GET(_request: NextRequest, ctx: RouteContext<"/api/classes/[id]/tasks">) {
   return withApi(async () => {
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/classes
         classId: id,
         title: body.title,
         description: body.description ?? null,
-        dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        dueDate: body.dueDate ? parseDateOnly(body.dueDate) : null,
       },
     })
 

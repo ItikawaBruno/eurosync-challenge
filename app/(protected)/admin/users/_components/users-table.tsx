@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Eye, Pencil, UserMinus } from "lucide-react"
+import { Eye, Pencil, UserMinus, UserPlus } from "lucide-react"
 import { DataTable, type Column } from "@/components/platform/ui/data-table"
 import { Button } from "@/components/platform/ui/button"
 import { RoleBadge, StatusBadge } from "@/components/platform/ui/status-badge"
@@ -90,6 +90,12 @@ export function UsersTable() {
             <option value="PROFESSOR">Professor</option>
             <option value="STUDENT">Aluno</option>
           </select>
+          {/* O modal de criacao ja existia, mas nada o abria: criar usuario
+              individualmente era impossivel pela interface, restando so o
+              import por CSV — e contas so podem ser criadas por admin. */}
+          <Button variant="accent" onClick={openCreate}>
+            <UserPlus className="h-4 w-4" />Adicionar usuario
+          </Button>
         </div>
         {isPending
           ? <TableSkeleton rows={6} />

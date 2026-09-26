@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireClassManage } from "@/lib/auth-server"
 import { withApi } from "@/lib/api"
 import { prisma } from "@/lib/prisma"
+import { parseDateOnly } from "@/lib/period"
 
 export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/tasks/[id]">) {
   return withApi(async () => {
@@ -15,7 +16,7 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/tasks/
       data: {
         title: body.title ?? undefined,
         description: body.description ?? null,
-        dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        dueDate: body.dueDate ? parseDateOnly(body.dueDate) : null,
       },
     })
 

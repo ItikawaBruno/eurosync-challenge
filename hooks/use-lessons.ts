@@ -74,7 +74,10 @@ export function useCreateLesson() {
   const mutation = useMutation({
     mutationFn: (payload: CreateLessonPayload) =>
       apiFetch<LessonRecord>("/api/lessons", { method: "POST", body: JSON.stringify(payload) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["lessons"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lessons"] })
+      queryClient.invalidateQueries({ queryKey: ["classes"] })
+    },
   })
   return {
     mutate: (payload: CreateLessonPayload, options?: { onSuccess?: () => void }) =>
@@ -87,7 +90,10 @@ export function useDeleteLesson() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: (id: string) => apiFetch<{ ok: true }>(`/api/lessons/${id}`, { method: "DELETE" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["lessons"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lessons"] })
+      queryClient.invalidateQueries({ queryKey: ["classes"] })
+    },
   })
   return {
     mutate: (id: string, options?: { onSuccess?: () => void }) => mutation.mutate(id, options),
