@@ -3,6 +3,9 @@ import { apiFetch } from "@/lib/fetcher"
 
 export type SeriesPoint = { label: string; value: number }
 
+/** Ponto de série temporal que distingue "0%" de "período sem medição". */
+export type MeasuredPoint = SeriesPoint & { measured: boolean }
+
 /** Variações calculadas a partir do banco. `null` = sem histórico para comparar. */
 type AdminTrends = {
   studentsDelta: number
@@ -15,7 +18,7 @@ type AdminDashboard = {
   totalClasses: number
   averageAttendance: number
   studentsAtRisk: number
-  monthlyAttendance: SeriesPoint[]
+  monthlyAttendance: MeasuredPoint[]
   engagementByClass: SeriesPoint[]
   totalLessons: number
   openAlerts: number
@@ -27,7 +30,7 @@ type ProfessorDashboard = {
   attendanceAverage: number
   myClasses: { id: string; name: string }[]
   studentsAtRisk: { id: string | null }[]
-  monthlyAttendance: SeriesPoint[]
+  monthlyAttendance: MeasuredPoint[]
   engagementByClass: SeriesPoint[]
 }
 
