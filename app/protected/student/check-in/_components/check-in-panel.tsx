@@ -100,7 +100,7 @@ export function CheckInPanel() {
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="rounded-xl border p-4">
                     <MapPin className="h-5 w-5 text-primary" />
-                    <p className="mt-2 font-medium">Localizacao {locationAvailable ? "validada" : "nao disponivel"}</p>
+                    <p className="mt-2 font-medium text-gray-800">Localizacao {locationAvailable ? "validada" : "nao disponivel"}</p>
                     <p className="text-sm text-muted-foreground">
                       {locationAvailable ? `${latitude?.toFixed(4)}, ${longitude?.toFixed(4)}` : "Ative a localização no dispositivo"}
                     </p>

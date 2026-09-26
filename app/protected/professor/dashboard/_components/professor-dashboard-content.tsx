@@ -37,7 +37,7 @@ export function ProfessorDashboardContent() {
             <div className="grid gap-3">
               {(lessons ?? []).slice(0, 5).map((lesson) => (
                 <div className="rounded-xl border p-4" key={lesson.id}>
-                  <p className="font-medium">{lesson.title}</p>
+                  <p className="font-medium text-gray-800">{lesson.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {new Date(lesson.startsAt).toLocaleDateString("pt-BR")} · {(lesson as any).locationName ?? ""}
                   </p>
@@ -52,7 +52,7 @@ export function ProfessorDashboardContent() {
               {(alerts ?? []).slice(0, 5).map((alert) => (
                 <div className="rounded-xl border p-4" key={alert.id}>
                   <div className="flex justify-between gap-3">
-                    <p className="font-medium">{alert.type}</p>
+                    <p className="font-medium text-gray-800">{alert.type}</p>
                     <StatusBadge label={alert.severity === "HIGH" ? "Em risco" : "Normal"} />
                   </div>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">{alert.message}</p>
