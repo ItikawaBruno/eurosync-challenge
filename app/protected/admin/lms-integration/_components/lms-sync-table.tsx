@@ -72,8 +72,8 @@ export function LmsSyncTable({
           <tbody className="divide-y">
             {entities.map(([entity, state]) => (
               <tr key={entity} className="transition hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium">{entityLabels[entity]}</td>
-                <td className="px-4 py-3">{state.count}</td>
+                <td className="px-4 py-3 font-medium text-gray-500">{entityLabels[entity]}</td>
+                <td className="px-4 py-3 text-gray-500">{state.count}</td>
                 <td className="px-4 py-3">
                   <StatusBadge label={statusLabel(state.status)} />
                 </td>

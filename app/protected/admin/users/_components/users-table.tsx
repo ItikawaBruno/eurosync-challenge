@@ -81,7 +81,7 @@ export function UsersTable() {
             aria-label="Filtrar por perfil"
             value={roleFilter ?? "ALL"}
             onChange={(e) => setRoleFilter(e.target.value === "ALL" ? undefined : e.target.value as UserRole)}
-            className="min-w-[140px] rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+            className="min-w-[140px] rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-gray-800"
           >
             <option value="ALL">Todos</option>
             <option value="ADMIN">Admin</option>

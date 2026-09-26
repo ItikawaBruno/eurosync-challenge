@@ -17,7 +17,7 @@ export function ScheduleList() {
           <div className="flex flex-col gap-4 rounded-xl border p-4 md:flex-row md:items-center md:justify-between" key={lesson.id}>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-semibold">{lesson.title}</h2>
+                <h2 className="font-semibold text-[#0f172b]">{lesson.title}</h2>
                 <StatusBadge label={lesson.status} />
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
