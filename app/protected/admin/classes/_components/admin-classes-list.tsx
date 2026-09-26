@@ -76,14 +76,14 @@ export function AdminClassesList() {
           <Card className="p-5" key={cls.id}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold">{cls.name}</h2>
+                <h2 className="text-lg font-semibold text-[#0f172b]">{cls.name}</h2>
                 {(cls as any).description && <p className="mt-1 text-sm text-muted-foreground">{(cls as any).description}</p>}
               </div>
               <StatusBadge label={cls.status} />
             </div>
             <dl className="mt-5 grid gap-3 text-sm">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Alunos</dt><dd className="font-medium">{(cls as any)._count?.students ?? 0}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Aulas</dt><dd className="font-medium">{(cls as any)._count?.lessons ?? 0}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Alunos</dt><dd className="font-medium text-gray-500">{(cls as any)._count?.students ?? 0}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Aulas</dt><dd className="font-medium text-gray-500">{(cls as any)._count?.lessons ?? 0}</dd></div>
             </dl>
             <div className="mt-5 flex gap-2">
               <Button className="flex-1" variant="outline" size="sm" onClick={() => openEditModal(cls)}>Editar</Button>
@@ -94,7 +94,7 @@ export function AdminClassesList() {
         ))}
         <Card className="flex min-h-72 flex-col items-center justify-center border-dashed p-6 text-center">
           <Button size="icon" variant="secondary" onClick={modal.open}><Plus className="h-5 w-5" /></Button>
-          <h2 className="mt-4 font-semibold">Criar turma</h2>
+          <h2 className="mt-4 font-semibold text-[#0f172b]">Criar turma</h2>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">Configure professor, local, calendario e alunos vinculados.</p>
           <Button className="mt-4" variant="accent" onClick={modal.open}>Nova turma</Button>
         </Card>

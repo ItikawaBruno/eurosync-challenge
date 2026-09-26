@@ -37,7 +37,7 @@ export function StudentDashboardContent() {
               {(alerts ?? []).slice(0, 5).map((alert) => (
                 <div className="rounded-xl border p-4" key={alert.id}>
                   <div className="flex justify-between gap-3">
-                    <p className="font-medium">{alert.type}</p>
+                    <p className="font-medium text-gray-800">{alert.type}</p>
                     <StatusBadge label={alert.status === "OPEN" ? "Pendente" : "Resolvido"} />
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">{alert.message}</p>

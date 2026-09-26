@@ -32,7 +32,7 @@ export function NotificationsList() {
               <div className="flex gap-3">
                 <div className="rounded-xl bg-secondary p-2 text-primary"><Bell className="h-5 w-5" /></div>
                 <div>
-                  <h2 className="font-semibold">{alert.type}</h2>
+                  <h2 className="font-semibold text-[#0f172b]">{alert.type}</h2>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">{alert.message}</p>
                 </div>
               </div>

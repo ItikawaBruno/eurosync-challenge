@@ -20,7 +20,7 @@ export function ImportsPanel() {
       <SectionCard title="Importar planilha" description="Envie CSV/XLSX estruturado para matriculas, turmas ou presencas.">
         <div className="rounded-2xl border border-dashed bg-slate-50 p-8 text-center">
           <UploadCloud className="mx-auto h-10 w-10 text-primary" />
-          <h2 className="mt-4 text-lg font-semibold">Arraste o arquivo ou selecione manualmente</h2>
+          <h2 className="mt-4 text-lg font-semibold text-gray-600">Arraste o arquivo ou selecione manualmente</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">A validacao de colunas e processamento serao executados automaticamente.</p>
           <Button className="mt-5" onClick={handleUpload}><FileSpreadsheet className="h-4 w-4" />Selecionar planilha</Button>
         </div>
@@ -36,7 +36,7 @@ export function ImportsPanel() {
                 <PlugZap className="h-5 w-5 text-primary" />
                 <div className="mt-3 flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-semibold">{integration.name}</h3>
+                    <h3 className="font-semibold text-[#0f172b]">{integration.name}</h3>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">{integration.provider} · {integration.baseUrl ?? "Sem URL"}</p>
                   </div>
                   <StatusBadge label={integration.status === "ACTIVE" ? "Ativo" : "Inativo"} />
