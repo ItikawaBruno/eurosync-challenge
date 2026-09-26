@@ -37,10 +37,25 @@ type UpdateLessonPayload = {
   status?: string
 } & LessonLocation
 
-export function useLessons(classId?: string) {
+type LessonsOptions = {
+  /** Só aulas a partir de agora, em ordem crescente. */
+  upcoming?: boolean
+  /** Limita a janela a N dias à frente. Requer `upcoming`. */
+  days?: number
+}
+
+export function useLessons(classId?: string, options?: LessonsOptions) {
+  const search = new URLSearchParams()
+  if (classId) search.set("classId", classId)
+  if (options?.upcoming) search.set("upcoming", "true")
+  if (options?.upcoming && options.days) search.set("days", String(options.days))
+  const queryString = search.toString()
+
   const query = useQuery({
-    queryKey: ["lessons", classId ?? "ALL"],
-    queryFn: () => apiFetch<LessonRecord[]>(`/api/lessons${classId ? `?classId=${classId}` : ""}`),
+    // Os parâmetros entram na chave: sem isso "todas as aulas" e "próximas 7 dias"
+    // compartilhariam cache e uma serviria a resposta da outra.
+    queryKey: ["lessons", classId ?? "ALL", options?.upcoming ?? false, options?.days ?? null],
+    queryFn: () => apiFetch<LessonRecord[]>(`/api/lessons${queryString ? `?${queryString}` : ""}`),
   })
   return { data: query.data, isPending: query.isPending }
 }

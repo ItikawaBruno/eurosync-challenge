@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/fetcher"
 
-type AlertRecord = {
+export type AlertRecord = {
   id: string
   status: string
   severity: string

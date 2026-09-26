@@ -71,7 +71,7 @@ export function CheckInPanel() {
   return (
     <>
       <div className="grid gap-6 xl:grid-cols-[1fr_0.85fr]">
-        <SectionCard title="Aula ativa" description={openLesson ? `${openLesson.title} · ${(openLesson as any).locationName ?? ""}` : "Nenhuma aula ativa"}>
+        <SectionCard title="Aula ativa" description={openLesson ? `${openLesson.title} · ${openLesson.locationName ?? ""}` : "Nenhuma aula ativa"}>
           <div className="grid gap-4">
             {openLesson ? (
               <>

@@ -8,7 +8,17 @@ import { DEFAULT_CHECKIN_RADIUS_M } from "@/lib/geo"
 export async function GET(request: NextRequest) {
   return withApi(async () => {
     const user = await requireUser()
-    const classId = request.nextUrl.searchParams.get("classId")
+    const params = request.nextUrl.searchParams
+    const classId = params.get("classId")
+
+    // "Próximas aulas" precisa ser de verdade: sem isto a listagem devolvia as
+    // aulas mais recentes do passado (orderBy desc, sem corte de data).
+    const upcoming = params.get("upcoming") === "true"
+    const days = Number(params.get("days"))
+    const hasWindow = upcoming && Number.isInteger(days) && days > 0
+
+    const windowEnd = new Date()
+    windowEnd.setDate(windowEnd.getDate() + days)
 
     const classFilter =
       user.role === "PROFESSOR"
@@ -21,8 +31,11 @@ export async function GET(request: NextRequest) {
       where: {
         ...(classId ? { classId } : {}),
         ...(classFilter ? { class: classFilter } : {}),
+        ...(upcoming
+          ? { startsAt: hasWindow ? { gte: new Date(), lte: windowEnd } : { gte: new Date() } }
+          : {}),
       },
-      orderBy: { startsAt: "desc" },
+      orderBy: { startsAt: upcoming ? "asc" : "desc" },
       include: { class: { select: { id: true, name: true } } },
     })
 

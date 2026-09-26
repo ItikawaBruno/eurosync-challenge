@@ -15,9 +15,9 @@ export function StudentDashboardContent() {
 
   if (dashLoading) return <PageSpinner />
 
-  const nextLesson = (dashboard as any)?.nextLesson
-  const attendanceRate = (dashboard as any)?.attendance?.rate ?? 0
-  const presentCount = (dashboard as any)?.attendance?.present ?? 0
+  const nextLesson = dashboard?.nextLesson
+  const attendanceRate = dashboard?.attendance?.rate ?? 0
+  const presentCount = dashboard?.attendance?.present ?? 0
 
   return (
     <div className="grid gap-6">

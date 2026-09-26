@@ -9,9 +9,9 @@ import { useStudentDashboard } from "@/hooks/use-dashboard"
 export function ProgressPanel() {
   const { data: dashboard, isPending } = useStudentDashboard()
 
-  const attendanceRate = (dashboard as any)?.attendance?.rate ?? 0
-  const presentCount = (dashboard as any)?.attendance?.present ?? 0
-  const totalLessons = (dashboard as any)?.attendance?.total ?? 0
+  const attendanceRate = dashboard?.attendance?.rate ?? 0
+  const presentCount = dashboard?.attendance?.present ?? 0
+  const totalLessons = dashboard?.attendance?.total ?? 0
 
   if (isPending) return <PageSpinner />
 

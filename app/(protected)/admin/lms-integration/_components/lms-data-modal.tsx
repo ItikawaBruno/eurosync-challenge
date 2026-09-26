@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, type ReactNode } from "react"
 import { AppModal, useOverlayState } from "@/components/platform/ui/app-modal"
 import { TableSkeleton } from "@/components/platform/ui/loading"
 import { useLmsData, type LmsSyncEntity } from "@/hooks/use-lms"
@@ -51,9 +51,9 @@ function LmsDataContent({ entity }: { entity: LmsSyncEntity }) {
   const { data, isPending } = useLmsData(entity)
 
   if (isPending) return <TableSkeleton rows={5} />
-  if (!data || (data as any[]).length === 0) return <p className="text-sm text-muted-foreground">Nenhum dado disponivel para esta entidade.</p>
+  if (!data || data.length === 0) return <p className="text-sm text-muted-foreground">Nenhum dado disponivel para esta entidade.</p>
 
-  const items = data as any[]
+  const items = data as LmsRow[]
   const columns = getColumnsForEntity(entity)
 
   return (
@@ -68,7 +68,7 @@ function LmsDataContent({ entity }: { entity: LmsSyncEntity }) {
         </thead>
         <tbody className="divide-y">
           {items.map((item, idx) => (
-            <tr key={item.id ?? idx} className="transition hover:bg-slate-50">
+            <tr key={String(item.id ?? idx)} className="transition hover:bg-slate-50">
               {columns.map((col) => (
                 <td key={col.key} className="px-3 py-2 whitespace-nowrap">{col.render(item)}</td>
               ))}
@@ -80,7 +80,12 @@ function LmsDataContent({ entity }: { entity: LmsSyncEntity }) {
   )
 }
 
-type ColumnDef = { key: string; label: string; render: (item: any) => string }
+// Os 10 registros de LMS tem formatos diferentes, e a tabela e generica de
+// proposito. O que da para afirmar com precisao e o formato do JSON que chega:
+// campos escalares (DateTime do Prisma vira string na serializacao).
+type LmsRow = Record<string, string | number | boolean | null>
+
+type ColumnDef = { key: string; label: string; render: (item: LmsRow) => ReactNode }
 
 function getColumnsForEntity(entity: LmsSyncEntity): ColumnDef[] {
   switch (entity) {
@@ -163,6 +168,7 @@ function getColumnsForEntity(entity: LmsSyncEntity): ColumnDef[] {
   }
 }
 
-function formatDate(iso: string): string {
+function formatDate(iso: string | number | boolean | null): string {
+  if (iso === null || typeof iso === "boolean") return "-"
   return new Date(iso).toLocaleDateString("pt-BR")
 }

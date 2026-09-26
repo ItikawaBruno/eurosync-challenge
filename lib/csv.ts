@@ -17,6 +17,34 @@ function parseLine(line: string): string[] {
   return cells.map((c) => c.trim())
 }
 
+function escapeCell(value: unknown) {
+  const text = value === null || value === undefined ? "" : String(value)
+  // Célula com vírgula, aspas ou quebra de linha precisa ir entre aspas, com as
+  // aspas internas duplicadas — senão o arquivo desalinha ao ser reaberto.
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
+}
+
+/** Serializa linhas em CSV. `columns` define a ordem e o cabeçalho. */
+export function toCsv<T extends Record<string, unknown>>(
+  rows: T[],
+  columns: Array<{ key: keyof T; header: string }>,
+): string {
+  const head = columns.map((column) => escapeCell(column.header)).join(",")
+  const body = rows.map((row) => columns.map((column) => escapeCell(row[column.key])).join(","))
+  return [head, ...body].join("\r\n")
+}
+
+export function downloadCsv(filename: string, content: string) {
+  // BOM para o Excel reconhecer UTF-8 e não quebrar acentuação.
+  const blob = new Blob([`﻿${content}`], { type: "text/csv;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 export function parseUserCsv(text: string): { name: string; email: string; role: string }[] {
   const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0)
   if (lines.length === 0) return []

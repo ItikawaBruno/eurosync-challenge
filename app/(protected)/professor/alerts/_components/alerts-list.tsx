@@ -149,7 +149,7 @@ export function AlertsList() {
       {resolvedAlerts.length > 0 && (
         <SectionCard title={`Alertas resolvidos (${resolvedAlerts.length})`} description="Casos já acompanhados.">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {resolvedAlerts.map((alert: any) => (
+            {resolvedAlerts.map((alert) => (
               <Card key={alert.id} className="border-slate-200 bg-slate-50 text-slate-700">
                 <div className="flex items-start justify-between gap-3">
                   <div>

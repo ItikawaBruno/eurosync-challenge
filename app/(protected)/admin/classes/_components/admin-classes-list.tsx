@@ -9,7 +9,7 @@ import { Input } from "@/components/platform/ui/forms"
 import { StatusBadge } from "@/components/platform/ui/status-badge"
 import { CardSkeleton } from "@/components/platform/ui/loading"
 import { AppModal, useOverlayState } from "@/components/platform/ui/app-modal"
-import { useClasses, useCreateClass, useUpdateClass, useDeleteClass } from "@/hooks/use-classes"
+import { useClasses, useCreateClass, useUpdateClass, useDeleteClass, type ClassRecord } from "@/hooks/use-classes"
 import { useUsers } from "@/hooks/use-user"
 
 export function AdminClassesList() {
@@ -25,8 +25,8 @@ export function AdminClassesList() {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [teacherId, setTeacherId] = useState("")
-  const [editingClass, setEditingClass] = useState<any>(null)
-  const [deletingClass, setDeletingClass] = useState<any>(null)
+  const [editingClass, setEditingClass] = useState<ClassRecord | null>(null)
+  const [deletingClass, setDeletingClass] = useState<ClassRecord | null>(null)
 
   const handleCreate = () => {
     if (!name.trim() || !teacherId) return
@@ -52,15 +52,15 @@ export function AdminClassesList() {
     )
   }
 
-  const openEditModal = (cls: any) => {
+  const openEditModal = (cls: ClassRecord) => {
     setEditingClass(cls)
     setName(cls.name)
-    setDescription((cls as any).description || "")
+    setDescription(cls.description || "")
     setTeacherId(cls.teacher?.id ?? "")
     editModal.open()
   }
 
-  const openDeleteModal = (cls: any) => {
+  const openDeleteModal = (cls: ClassRecord) => {
     setDeletingClass(cls)
     deleteConfirmModal.open()
   }
@@ -79,14 +79,14 @@ export function AdminClassesList() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-[#0f172b]">{cls.name}</h2>
-                {(cls as any).description && <p className="mt-1 text-sm text-muted-foreground">{(cls as any).description}</p>}
+                {cls.description && <p className="mt-1 text-sm text-muted-foreground">{cls.description}</p>}
               </div>
               <StatusBadge label={cls.status} />
             </div>
             <dl className="mt-5 grid gap-3 text-sm">
               <div className="flex justify-between"><dt className="text-muted-foreground">Professor</dt><dd className="font-medium text-gray-500">{cls.teacher?.name ?? "-"}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Alunos</dt><dd className="font-medium text-gray-500">{(cls as any)._count?.students ?? 0}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Aulas</dt><dd className="font-medium text-gray-500">{(cls as any)._count?.lessons ?? 0}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Alunos</dt><dd className="font-medium text-gray-500">{cls._count?.students ?? 0}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Aulas</dt><dd className="font-medium text-gray-500">{cls._count?.lessons ?? 0}</dd></div>
             </dl>
             <div className="mt-5 flex gap-2">
               <Button className="flex-1" variant="outline" size="sm" onClick={() => openEditModal(cls)}>Editar</Button>

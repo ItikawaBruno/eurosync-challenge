@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth-server"
 import { withApi } from "@/lib/api"
 import { prisma } from "@/lib/prisma"
 import { attendanceRate, monthlyAttendanceSeries } from "@/lib/attendance-stats"
+import { classEngagementSeries } from "@/lib/task-stats"
 
 export async function GET() {
   return withApi(async () => {
@@ -10,7 +11,12 @@ export async function GET() {
 
     const classes = await prisma.class.findMany({
       where: { teacherId: user.id },
-      select: { id: true, name: true },
+      select: {
+        id: true,
+        name: true,
+        _count: { select: { students: true } },
+        tasks: { select: { _count: { select: { submissions: true } } } },
+      },
     })
     const classIds = classes.map((c) => c.id)
 
@@ -31,12 +37,21 @@ export async function GET() {
 
     const records = attendances.map((a) => ({ status: a.status, lessonStartsAt: a.lesson.startsAt }))
 
+    const engagementByClass = classEngagementSeries(
+      classes.map((klass) => ({
+        name: klass.name,
+        students: klass._count.students,
+        tasks: klass.tasks.map((task) => ({ submissions: task._count.submissions })),
+      })),
+    )
+
     return NextResponse.json({
       summary: { lessons: lessonCount, students: studentCount.length, alerts: openAlerts },
       attendanceAverage: attendanceRate(records),
-      myClasses: classes,
+      myClasses: classes.map((c) => ({ id: c.id, name: c.name })),
       studentsAtRisk: atRiskStudents.map((s) => ({ id: s.studentId })),
       monthlyAttendance: monthlyAttendanceSeries(records),
+      engagementByClass,
     })
   })
 }

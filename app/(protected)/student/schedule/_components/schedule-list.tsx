@@ -7,7 +7,9 @@ import { CardSkeleton } from "@/components/platform/ui/loading"
 import { useLessons } from "@/hooks/use-lessons"
 
 export function ScheduleList() {
-  const { data: lessons, isPending } = useLessons()
+  // Só aulas a partir de agora, em ordem crescente. Sem isto a lista de
+  // "proximas aulas" mostrava as aulas mais recentes do passado.
+  const { data: lessons, isPending } = useLessons(undefined, { upcoming: true })
 
   return (
     <SectionCard title="Proximas aulas" description="Agenda presencial com data, horario, local e professor.">
@@ -25,9 +27,9 @@ export function ScheduleList() {
                 {new Date(lesson.startsAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} às{" "}
                 {new Date(lesson.endsAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
               </p>
-              {(lesson as any).locationName && (
+              {lesson.locationName && (
                 <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />{(lesson as any).locationName}
+                  <MapPin className="h-4 w-4" />{lesson.locationName}
                 </p>
               )}
             </div>

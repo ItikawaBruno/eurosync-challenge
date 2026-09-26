@@ -40,6 +40,19 @@ export function monthlyAttendanceSeries(
   }))
 }
 
+/**
+ * Variação entre os dois últimos pontos de uma série percentual, em **pontos
+ * percentuais** (não em %: a diferença entre 40% e 50% é 10pp, não 25%).
+ * Devolve null quando não há dois pontos com medição para comparar.
+ */
+export function trendInPoints(series: Array<{ value: number }>) {
+  if (series.length < 2) return null
+  const current = series[series.length - 1]
+  const previous = series[series.length - 2]
+  if (current.value === 0 && previous.value === 0) return null
+  return current.value - previous.value
+}
+
 export function attendanceRate(records: Array<{ status: string }>) {
   const considered = scored(records)
   if (considered.length === 0) return 0

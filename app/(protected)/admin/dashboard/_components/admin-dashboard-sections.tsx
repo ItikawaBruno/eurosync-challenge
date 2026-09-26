@@ -22,8 +22,8 @@ export function AdminDashboardSections() {
       <SectionCard title="Frequencia por mes" description="Evolucao consolidada das acoes presenciais." contentClassName="h-[320px]">
         <AttendanceLineChart data={dashboard?.monthlyAttendance ?? []} />
       </SectionCard>
-      <SectionCard title="Engajamento por frente" description="Indicadores digitais." contentClassName="h-[320px]">
-        <EngagementBarChart data={[{ label: "Moodle", value: 78 }, { label: "Aulas", value: 86 }, { label: "Avisos", value: 72 }, { label: "Atividades", value: 81 }]} />
+      <SectionCard title="Engajamento por turma" description="Entregas de tarefas sobre o total esperado." contentClassName="h-[320px]">
+        <EngagementBarChart data={dashboard?.engagementByClass ?? []} />
       </SectionCard>
       <SectionCard title="Alertas recentes" description="Sinais que pedem acao da equipe pedagogica.">
         {alertsLoading ? <CardSkeleton /> : (
@@ -61,7 +61,7 @@ export function AdminDashboardSections() {
                   <div>
                     <p className="font-medium text-gray-800">{cls.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {cls.status} · {(cls as any)._count?.lessons ?? 0} aulas
+                      {cls.status} · {cls._count?.lessons ?? 0} aulas
                     </p>
                   </div>
                 </div>

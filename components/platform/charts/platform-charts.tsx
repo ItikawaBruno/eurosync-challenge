@@ -1,9 +1,32 @@
-import { type ReactNode } from "react"
+type SeriesPoint = { label: string; value: number }
 
-export function AttendanceLineChart({ data }: { data: Array<{ label: string; value: number }> }) {
+// Com os mocks removidos, série vazia passa a acontecer de verdade (banco novo,
+// turma sem tarefa, período sem aula). Banco vazio precisa *parecer* banco
+// vazio — antes o card renderizava em branco e lia como bug.
+function ChartFrame({
+  title,
+  isEmpty,
+  children,
+}: {
+  title: string
+  isEmpty: boolean
+  children: React.ReactNode
+}) {
   return (
     <div className="h-full rounded-3xl border border-slate-200 bg-white p-6">
-      <div className="text-sm text-muted-foreground">Linha de frequência</div>
+      <div className="text-sm text-muted-foreground">{title}</div>
+      {isEmpty ? (
+        <p className="mt-6 text-sm text-muted-foreground">Sem dados no periodo.</p>
+      ) : (
+        children
+      )}
+    </div>
+  )
+}
+
+export function AttendanceLineChart({ data }: { data: SeriesPoint[] }) {
+  return (
+    <ChartFrame title="Linha de frequência" isEmpty={data.length === 0}>
       <div className="mt-6 grid gap-2 text-sm text-slate-900">
         {data.map((item) => (
           <div key={item.label} className="flex items-center gap-3">
@@ -15,15 +38,14 @@ export function AttendanceLineChart({ data }: { data: Array<{ label: string; val
           </div>
         ))}
       </div>
-    </div>
+    </ChartFrame>
   )
 }
 
-export function CountBarChart({ data, title = "Evolucao" }: { data: Array<{ label: string; value: number }>; title?: string }) {
+export function CountBarChart({ data, title = "Evolucao" }: { data: SeriesPoint[]; title?: string }) {
   const max = Math.max(1, ...data.map((d) => d.value))
   return (
-    <div className="h-full rounded-3xl border border-slate-200 bg-white p-6">
-      <div className="text-sm text-muted-foreground">{title}</div>
+    <ChartFrame title={title} isEmpty={data.length === 0}>
       <div className="mt-6 grid gap-3">
         {data.map((item) => (
           <div key={item.label} className="flex items-center gap-3">
@@ -35,14 +57,13 @@ export function CountBarChart({ data, title = "Evolucao" }: { data: Array<{ labe
           </div>
         ))}
       </div>
-    </div>
+    </ChartFrame>
   )
 }
 
-export function EngagementBarChart({ data }: { data: Array<{ label: string; value: number }> }) {
+export function EngagementBarChart({ data }: { data: SeriesPoint[] }) {
   return (
-    <div className="h-full rounded-3xl border border-slate-200 bg-white p-6">
-      <div className="text-sm text-muted-foreground">Engajamento</div>
+    <ChartFrame title="Engajamento" isEmpty={data.length === 0}>
       <div className="mt-6 grid gap-3">
         {data.map((item) => (
           <div key={item.label} className="space-y-2">
@@ -56,6 +77,6 @@ export function EngagementBarChart({ data }: { data: Array<{ label: string; valu
           </div>
         ))}
       </div>
-    </div>
+    </ChartFrame>
   )
 }

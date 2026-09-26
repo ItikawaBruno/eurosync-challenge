@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { Menu, Search } from "lucide-react"
+import { Menu } from "lucide-react"
 import { AppSidebar } from "@/components/platform/layout/app-sidebar"
 import { UserAvatar } from "@/components/platform/layout/user-avatar"
 import type { UserRole } from "@/types/platform"
@@ -39,16 +39,12 @@ export function AppHeader({ role }: { role: UserRole }) {
           ))}
         </nav>
       </div>
+      {/*
+        A busca global foi removida: nao existe endpoint de busca no projeto, e o
+        campo era puramente decorativo. Busca global e feature propria (indice,
+        escopo por role, ranking) e volta com backend.
+      */}
       <div className="flex items-center gap-3">
-        <label className="relative hidden w-72 md:block">
-          <span className="sr-only">Buscar na plataforma</span>
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            className="h-10 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800 outline-none"
-            placeholder="Buscar turmas, usuarios, aulas"
-            type="search"
-          />
-        </label>
         <UserAvatar role={role} />
       </div>
       {open ? (

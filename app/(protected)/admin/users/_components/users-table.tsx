@@ -18,6 +18,7 @@ export function UsersTable() {
   const [search, setSearch] = useState("")
   const [selected, setSelected] = useState<ApiUser | null>(null)
 
+  const viewModal = useOverlayState()
   const editModal = useOverlayState()
   const deleteModal = useOverlayState()
   const createModalState = useOverlayState()
@@ -38,6 +39,7 @@ export function UsersTable() {
   )
 
   const openCreate = () => { createModalState.open() }
+  const openView = (u: ApiUser) => { setSelected(u); viewModal.open() }
   const openEdit = (u: ApiUser) => { setSelected(u); setEditName(u.name); editModal.open() }
   const openDelete = (u: ApiUser) => { setSelected(u); deleteModal.open() }
   
@@ -59,7 +61,7 @@ export function UsersTable() {
     {
       key: "actions", header: "Acoes", cell: (u) => (
         <div className="flex gap-2">
-          <Button aria-label="Visualizar" size="icon" variant="ghost"><Eye className="h-4 w-4" /></Button>
+          <Button aria-label="Visualizar" size="icon" variant="ghost" onClick={() => openView(u as ApiUser)}><Eye className="h-4 w-4" /></Button>
           <Button aria-label="Editar" size="icon" variant="ghost" onClick={() => openEdit(u as ApiUser)}><Pencil className="h-4 w-4" /></Button>
           <Button aria-label="Desativar" size="icon" variant="ghost" onClick={() => openDelete(u as ApiUser)}><UserMinus className="h-4 w-4" /></Button>
         </div>
@@ -127,6 +129,31 @@ export function UsersTable() {
             </select>
           </label>
         </div>
+      </AppModal>
+
+      <AppModal
+        state={viewModal}
+        title="Detalhes do usuario"
+        footer={<Button variant="outline" onClick={viewModal.close}>Fechar</Button>}
+      >
+        <dl className="grid gap-3 text-sm">
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted-foreground">Nome</dt>
+            <dd className="font-medium text-slate-800">{selected?.name}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted-foreground">E-mail</dt>
+            <dd className="font-medium text-slate-800">{selected?.email}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <dt className="text-muted-foreground">Perfil</dt>
+            <dd>{selected ? <RoleBadge role={selected.role as UserRole} /> : null}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <dt className="text-muted-foreground">Status</dt>
+            <dd><StatusBadge label={selected?.isActive ? "Ativo" : "Inativo"} /></dd>
+          </div>
+        </dl>
       </AppModal>
 
       <AppModal

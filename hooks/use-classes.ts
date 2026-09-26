@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/fetcher"
 
-type ClassRecord = {
+export type ClassRecord = {
   id: string
   name: string
   description: string | null
