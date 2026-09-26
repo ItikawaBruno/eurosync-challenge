@@ -54,7 +54,13 @@ export function LmsSyncTable({
 }) {
   const syncEntity = useLmsSyncEntity()
 
-  const entities = Object.entries(overview) as [LmsSyncEntity, SyncEntityState][]
+  // A resposta de /api/lms/overview carrega `syncs` e `pending` junto das 10
+  // entidades. Iterar com Object.entries rendia duas linhas fantasma, sem nome
+  // nem contagem — o `as` que havia aqui mascarava justamente isso.
+  // A lista de entidades sai dos rótulos, que são a fonte da verdade na UI.
+  const entities = (Object.keys(entityLabels) as LmsSyncEntity[])
+    .map((entity) => [entity, overview[entity]] as const)
+    .filter((pair): pair is readonly [LmsSyncEntity, SyncEntityState] => Boolean(pair[1]))
 
   return (
     <SectionCard title="Entidades de sincronizacao" description="Controle individual de cada tipo de dado importado do Moodle.">

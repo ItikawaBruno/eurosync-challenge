@@ -5,6 +5,36 @@ import { PrismaPg } from "@prisma/adapter-pg"
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })
 
+/**
+ * Este seed grava dados de DEMONSTRAÇÃO (alunos fictícios, aulas, presenças,
+ * registros de LMS). Rodá-lo num banco real enche a aplicação de dados falsos,
+ * indistinguíveis de dados de produção nas telas.
+ *
+ * Por isso ele só roda contra host local. Para qualquer outro host é preciso
+ * dizer explicitamente que a intenção é essa:
+ *   ALLOW_REMOTE_SEED=1 npx tsx --env-file=.env prisma/seed.ts
+ */
+function assertSeedIsAllowed() {
+  const url = process.env.DATABASE_URL
+  if (!url) throw new Error("DATABASE_URL não definido.")
+
+  let host: string
+  try {
+    host = new URL(url).hostname
+  } catch {
+    throw new Error("DATABASE_URL inválido — não foi possível ler o host.")
+  }
+
+  const isLocal = ["localhost", "127.0.0.1", "::1", "db", "postgres"].includes(host)
+  if (isLocal || process.env.ALLOW_REMOTE_SEED === "1") return
+
+  throw new Error(
+    `Seed bloqueado: "${host}" nao e um banco local.\n` +
+      "Este seed insere dados de demonstracao e nao deve rodar em banco real.\n" +
+      "Se for realmente a intencao, rode com ALLOW_REMOTE_SEED=1.",
+  )
+}
+
 const LMS_ENTITIES = [
   "COURSES",
   "CLASSES",
@@ -19,6 +49,8 @@ const LMS_ENTITIES = [
 ] as const
 
 async function main() {
+  assertSeedIsAllowed()
+
   const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@euro-sync.com"
 
   const admin = await prisma.user.upsert({
