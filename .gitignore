@@ -42,3 +42,9 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Worktrees e estado local do Claude Code (nao pertencem ao repositorio).
+# O diretorio estava commitado como gitlink sem .gitmodules, o que fazia a
+# Vercel avisar "Failed to fetch one or more git submodules" a cada deploy.
+.claude/worktrees/
+.claude/settings.local.json
