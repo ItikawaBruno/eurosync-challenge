@@ -26,9 +26,7 @@ async function provisionUser(clerkId: string) {
 
   const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || email
 
-  const metadataRole = clerkUser.publicMetadata?.role as UserRole | undefined
-  const role: UserRole = metadataRole
-    ?? (email.toLowerCase() === (process.env.SEED_ADMIN_EMAIL || "").toLowerCase() && email ? "ADMIN" : "STUDENT")
+  const role: UserRole = (clerkUser.publicMetadata?.role as UserRole | undefined) ?? "STUDENT"
 
   const user = await prisma.user.upsert({
     where: { email },
