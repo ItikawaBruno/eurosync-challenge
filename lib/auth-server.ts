@@ -1,7 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server"
 import type { UserRole } from "@/types/platform"
 import { prisma } from "@/lib/prisma"
-import { syncClerkRole } from "@/lib/clerk-provision"
 
 export class UnauthorizedError extends Error {
   constructor() {
@@ -15,7 +14,10 @@ export class ForbiddenError extends Error {
   }
 }
 
-async function provisionUser(clerkId: string) {
+export async function requireUser() {
+  const { userId } = await auth()
+  if (!userId) throw new UnauthorizedError()
+
   const clerkUser = await currentUser()
   if (!clerkUser) throw new UnauthorizedError()
 
@@ -25,27 +27,13 @@ async function provisionUser(clerkId: string) {
   if (!email) throw new UnauthorizedError()
 
   const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || email
-
   const role: UserRole = (clerkUser.publicMetadata?.role as UserRole | undefined) ?? "STUDENT"
 
-  const user = await prisma.user.upsert({
+  return prisma.user.upsert({
     where: { email },
-    update: { clerkId },
-    create: { clerkId, email, name, role, status: "ACTIVE" },
+    update: { clerkId: userId, name, role },
+    create: { clerkId: userId, email, name, role, status: "ACTIVE" },
   })
-
-  await syncClerkRole(clerkId, user.role)
-  return user
-}
-
-export async function requireUser() {
-  const { userId } = await auth()
-  if (!userId) throw new UnauthorizedError()
-
-  const existing = await prisma.user.findUnique({ where: { clerkId: userId } })
-  if (existing) return existing
-
-  return provisionUser(userId)
 }
 
 export async function requireRole(...roles: UserRole[]) {
