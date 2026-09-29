@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 import { AppSidebar } from "@/components/platform/layout/app-sidebar"
 import { UserAvatar } from "@/components/platform/layout/user-avatar"
-import { RoleSwitcher } from "@/components/platform/layout/role-switcher"
 import type { UserRole } from "@/types/platform"
 
 function breadcrumbFromPath(pathname: string) {
@@ -46,7 +45,6 @@ export function AppHeader({ role }: { role: UserRole }) {
         escopo por role, ranking) e volta com backend.
       */}
       <div className="flex items-center gap-3">
-        <RoleSwitcher role={role} />
         <UserAvatar role={role} />
       </div>
       {open ? (

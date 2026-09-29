@@ -6,10 +6,6 @@ import { X } from "lucide-react"
 import { BrandIcon, navItems, roleHome, roleLabel } from "@/lib/platform-navigation"
 import type { UserRole } from "@/types/platform"
 
-// Todas as telas ficam no menu, agrupadas por perfil: qualquer usuário logado
-// pode abrir qualquer uma.
-const NAV_GROUPS: UserRole[] = ["ADMIN", "PROFESSOR", "STUDENT"]
-
 export function AppSidebar({
   role,
   mobile = false,
@@ -20,24 +16,7 @@ export function AppSidebar({
   onClose?: () => void
 }) {
   const pathname = usePathname()
-
-  const renderItem = (item: (typeof navItems)[number]) => {
-    const Icon = item.icon
-    const active = pathname === item.href || pathname?.startsWith(`${item.href}/`)
-    return (
-      <Link
-        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-          active ? "bg-white text-[#002147]" : "text-slate-200 hover:bg-white/10 hover:text-white"
-        }`}
-        href={item.href}
-        key={item.href}
-        onClick={onClose}
-      >
-        <Icon className="h-4 w-4" />
-        {item.title}
-      </Link>
-    )
-  }
+  const items = navItems.filter((item) => item.roles.includes(role))
 
   return (
     <aside
@@ -67,21 +46,29 @@ export function AppSidebar({
           </button>
         ) : null}
       </div>
-      <nav aria-label="Navegacao principal" className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {NAV_GROUPS.map((group) => (
-          <div className="pb-2" key={group}>
-            <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-              {roleLabel[group]}
-            </p>
-            {navItems.filter((item) => item.roles.includes(group)).map(renderItem)}
-          </div>
-        ))}
+      <nav aria-label="Navegacao principal" className="flex-1 space-y-1 px-3 py-4">
+        {items.map((item) => {
+          const Icon = item.icon
+          const active = pathname === item.href || pathname?.startsWith(`${item.href}/`)
+          return (
+            <Link
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                active ? "bg-white text-[#002147]" : "text-slate-200 hover:bg-white/10 hover:text-white"
+              }`}
+              href={item.href}
+              key={item.href}
+              onClick={onClose}
+            >
+              <Icon className="h-4 w-4" />
+              {item.title}
+            </Link>
+          )
+        })}
       </nav>
       <div className="border-t border-white/10 p-4">
         <div className="rounded-2xl bg-white/8 p-4 ring-1 ring-white/10">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-300">Perfil atual</p>
           <p className="mt-1 text-sm font-semibold">{roleLabel[role]}</p>
-          <p className="mt-1 text-xs text-slate-300">Troque o perfil pelo seletor no cabeçalho.</p>
         </div>
       </div>
     </aside>
