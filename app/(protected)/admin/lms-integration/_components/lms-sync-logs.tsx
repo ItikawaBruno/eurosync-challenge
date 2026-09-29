@@ -28,23 +28,29 @@ export function LmsSyncLogs() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {logs.slice(0, 30).map((log) => (
-                <tr key={log.id} className="transition hover:bg-slate-50">
-                  <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
-                    {formatTime(log.timestamp)}
-                  </td>
-                  <td className="px-4 py-2 capitalize text-gray-500">{log.action.replace("_", " ")}</td>
-                  <td className="px-4 py-2 capitalize text-gray-500">{log.entity}</td>
-                  <td className="px-4 py-2 text-gray-500">{log.recordsProcessed}</td>
-                  <td className="px-4 py-2">
-                    <StatusBadge
-                      label={log.status === "success" ? "OK" : log.status === "warning" ? "Alerta" : "Erro"}
-                      tone={log.status === "success" ? "success" : log.status === "warning" ? "warning" : "danger"}
-                    />
-                  </td>
-                  <td className="max-w-xs truncate px-4 py-2 text-muted-foreground">{log.message}</td>
-                </tr>
-              ))}
+              {logs.slice(0, 30).map((log) => {
+                // /api/lms/logs devolve o enum do Prisma cru ("SUCCESS"), enquanto
+                // /api/lms/overview ja entrega minusculo. Normalizar aqui evita que
+                // um sync bem-sucedido apareca como "Erro".
+                const status = log.status.toLowerCase()
+                return (
+                  <tr key={log.id} className="transition hover:bg-slate-50">
+                    <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
+                      {formatTime(log.timestamp)}
+                    </td>
+                    <td className="px-4 py-2 capitalize text-gray-500">{log.action.replace("_", " ")}</td>
+                    <td className="px-4 py-2 capitalize text-gray-500">{log.entity}</td>
+                    <td className="px-4 py-2 text-gray-500">{log.recordsProcessed}</td>
+                    <td className="px-4 py-2">
+                      <StatusBadge
+                        label={status === "success" ? "OK" : status === "warning" ? "Alerta" : "Erro"}
+                        tone={status === "success" ? "success" : status === "warning" ? "warning" : "danger"}
+                      />
+                    </td>
+                    <td className="max-w-xs truncate px-4 py-2 text-muted-foreground">{log.message}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
